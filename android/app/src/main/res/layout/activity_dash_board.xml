@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".activity.DashBoardActivity"
+    android:id="@+id/rootScroll"
+    android:fillViewport="true">
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:name="br.com.quarky.fidelitygourmet.fragment.BlankFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></FrameLayout>
+
+</ScrollView>

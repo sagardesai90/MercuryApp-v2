@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/rounded_background_dark"
+    android:fillViewport="true"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/titleHeight"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/titleHPadding"
+        android:paddingVertical="@dimen/titleVPadding">
+
+        <quarky.com.br.mercuryjacket.ui.view.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="About Smart Mode"
+            android:textColor="@color/white"
+            android:textSize="@dimen/titleSize"
+            app:fontFamily="@string/regular_font" />
+
+        <ImageView
+            android:id="@+id/close_bt"
+            android:layout_width="@dimen/infoIconWidth"
+            android:layout_height="@dimen/infoIconHeight"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/x"/>
+
+    </RelativeLayout>
+
+    <include layout="@layout/divide_clean" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="vertical"
+        android:paddingBottom="35dp"
+        android:paddingHorizontal="25dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="30dp"
+        android:weightSum="100">
+
+        <quarky.com.br.mercuryjacket.ui.view.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:text="Mercury uses motion &amp; temprature\nsensors with your input to provide the\nOptimal Heat at the right time "
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:fontFamily="@string/regular_font" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="100"
+            android:src="@drawable/about_smart_bar" />
+
+        <quarky.com.br.mercuryjacket.ui.view.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="As you change heat in “Smart Mode”, the\njacket learns for future reference."
+            android:textAlignment="center"
+            android:textColor="@color/greyThree"
+            android:textSize="14sp"
+            app:fontFamily="@string/regular_font" />
+
+    </LinearLayout>
+
+</LinearLayout>

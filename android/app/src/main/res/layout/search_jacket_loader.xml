@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<quarky.com.br.mercuryjacket.ui.layout.SearchJacketLoader
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/progress_bar_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/loaded_bar"
+        android:tint="@color/darkgrey" />
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:weightSum="100">
+
+        <ImageView
+            android:id="@+id/ic_jacket"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="60"
+            android:adjustViewBounds="true"
+            android:src="@drawable/jacket" />
+    </LinearLayout>
+
+</quarky.com.br.mercuryjacket.ui.layout.SearchJacketLoader>

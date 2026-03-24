@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>APIKey</key>
+	<string>eyJhbGciOiJSU0EtU0hBMjU2IiwidmVyIjoiMSJ9.eyJ2ZXIiOiIzIiwiZW5kcG9pbnRzIjp7ImF1dGh6IjoiaHR0cHM6Ly93d3cuYW1hem9uLmNvbS9hcC9vYSIsInRva2VuRXhjaGFuZ2UiOiJodHRwczovL2FwaS5hbWF6b24uY29tL2F1dGgvbzIvdG9rZW4ifSwiY2xpZW50SWQiOiJhbXpuMS5hcHBsaWNhdGlvbi1vYTItY2xpZW50LjliOGRiODc3MTBlZTRlNGViYmI5MmEzMDgwNWJhNjE3IiwiYXBwRmFtaWx5SWQiOiJhbXpuMS5hcHBsaWNhdGlvbi44MGU4YjQ1NzgyOTU0ZjMwYWQ4NWRmZjhkNGRlNTBjOCIsImJ1bmRsZVNlZWRJZCI6Im1pbmlzdHJ5b2ZzdXBwbHkuTWVyY3VyeUphY2tldCIsImJ1bmRsZUlkIjoibWluaXN0cnlvZnN1cHBseS5NZXJjdXJ5SmFja2V0IiwiaXNzIjoiQW1hem9uIiwidHlwZSI6IkFQSUtleSIsImFwcFZhcmlhbnRJZCI6ImFtem4xLmFwcGxpY2F0aW9uLWNsaWVudC5lZmEzY2Y2Njk2M2U0M2RlODRkYmQwMzgwYmM3YzY1ZiIsInRydXN0UG9vbCI6bnVsbCwiYXBwSWQiOiJhbXpuMS5hcHBsaWNhdGlvbi1jbGllbnQuZWZhM2NmNjY5NjNlNDNkZTg0ZGJkMDM4MGJjN2M2NWYiLCJpZCI6Ijk4MzdiMzU1LWNjMWItNDY3Zi1iNjRhLTY1ZThiYjBjYjk2YSIsImlhdCI6IjE1NzIzODA1NDU1MDUifQ==.k/pjlwOX/dHb65gIJ08eqyCSosuOCbpqmB8Hu/72ELbsgetybBrZl7l7g9wYI9o8STGFeylyF8+vXJrUVhNXRM0LjtqYJNdXBZOeCP76scdEEhjXouiWjnb3BNqlCOETow3L49sAcbJ+ARLbTUkrXUTvPGO3KZmL2yrNkitzuuySGGSmUHelOe0TfdtgpAmOetz24PnDdPTvqgG2Jsl6gt236JAvTa9LpL0bW+q+kWMAXlXTXPQnsYPZmGoee8lEcXOTc6lHkC752Swdm8pRrLA/E0DEHfbqcH3o3Dey3uhOegMkzN2V83O7woOOjjhWCHWORmokH5lc05/W4MABaA==</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string></string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>ministryofsupply.MercuryJacket</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>amzn-ministryofsupply.MercuryJacket</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Connection with jacket</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Connection with jacket</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Get the local temperature</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Get the local temperature</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Founders Grotesk Semibold.otf</string>
+		<string>Founders Grotesk Regular.otf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Switch
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/switchWidth"
+    android:layout_height="@dimen/switchHeight"
+    android:layout_alignParentRight="true"
+    android:padding="@dimen/switchPadding"
+    android:textOn="ON"
+    android:thumb="@drawable/drag_switch_button"
+    android:track="@drawable/bg_switch_button"
+    android:textOff="OFF" />

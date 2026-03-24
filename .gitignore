@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Android
+*.iml
+.gradle/
+android/local.properties
+android/.idea/
+android/build/
+android/captures/
+android/.externalNativeBuild/
+android/key
+android/key.old
+android/key_old
+android/*.keystore
+android/hs_err_*.log
+android/app/src/main/assets/api_key.txt
+
+# iOS
+ios-v2/Pods/
+ios-v2/xcuserdata/
+ios-v2/*.xcarchive
+ios-v2/*.ipa
+ios-v2/DerivedData/
+ios-v2/**/.DS_Store

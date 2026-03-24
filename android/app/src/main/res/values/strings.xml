@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Mercury Jacket</string>
+    <string name="jackets_pref_key">jackets</string>
+    <string name="input_history">input_history</string>
+    <string name="current_jacket">current jacket</string>
+    <string name="searching_title">Looking for a new jacket…</string>
+    <string name="bluetooth_alert_text">Thermal Jacket uses Bluetooth\n for connectivity</string>
+    <string name="connecting_title">Connecting to %s jacket…</string>
+    <string name="jacket_disconnected">%s is Not Connected</string>
+    <string name="connected">Connected!</string>
+    <string name="found">Found!</string>
+    <string name="new_jacket_title">Add a new jacket</string>
+    <string name="enter_jack_name">Enter a name for the jacket.</string>
+    <string name="no_jacket_found">The Jacket Could not be found. Make sure the device is ON and charged.</string>
+    <string name="confirm_added">Hooray! Your Jacket was successfully added. Start browsing it now.</string>
+    <string name="quit_message">Are you sure you want to exit application?</string>
+    <string name="bluetooth_request">Bluetooth is required to use this app, would you like to continue using this app?</string>
+    <string name="bluetooth_required">Bluetooth is required to use this app.</string>
+    <string name="location_request">Location permission is required to use this app, would you like to continue using the app?</string>
+    <string name="location_blocked">This app needs permission for the location, enable the permission on the settings app.</string>
+
+    <string name="add_text">+ Add a new jacket</string>
+    <string name="disconnect">Disconnect %s</string>
+    <string name="delete">Delete %s</string>
+    <string name="connect">Connect %s</string>
+    <string name="delete_yes">Cancel</string>
+    <string name="delete_no">Delete</string>
+    <string name="disconnect_no">Disconnect</string>
+    <string name="ask_delete">Are you sure you want to delete \"%s\"? All data will be deleted and cannot be undone.</string>
+    <string name="ask_disconnect">Are you sure you want to disconnect \"%s\"?</string>
+    <string name="confirm_delete">The Jacket \"%s\" was deleted.</string>
+    <string name="confirm_disconnect">The Jacket \"%s\" was disconnected.</string>
+    <string name="ask_connect">Would you like to connect with the \"%s\" jacket?</string>
+    <string name="settings_title">Settings</string>
+    <string name="connection_lost">The \"%s\" Jacket appears to be out of range or has lost connection, please move your device closer to reconnect.</string>
+
+    <!-- jacket settings -->
+    <string name="voice_control">Activate voice control through “Alexa”</string>
+    <string name="battery_notification">Send Push notification when battery hits 15\%%</string>
+    <string name="allow_connection">Allow location to be detected</string>
+    <string name="motion_control">Enable Activity based Temperature control</string>
+    <string name="temperature_measure">temperature_measure</string>
+
+    <!-- fonts settings -->
+    <string name="regular_font">fg_regular.otf</string>
+    <string name="semibold_font">fg_semibold.otf</string>
+    <string name="motion_sensor">Activity Sensor: %s</string>
+</resources>

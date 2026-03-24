@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.SettingsActivity"
+    android:background="@drawable/rounded_background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/titleHeight"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/titleHPadding"
+            android:paddingVertical="@dimen/titleVPadding">
+
+            <quarky.com.br.mercuryjacket.ui.view.CustomTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:text="@string/settings_title"
+                android:textColor="@color/white"
+                android:textSize="@dimen/titleSize"
+                app:fontFamily="@string/regular_font"/>
+
+            <include layout="@layout/close_button" />
+
+        </RelativeLayout>
+
+        <include layout="@layout/divide_dark" />
+
+        <LinearLayout
+            android:id="@+id/jackets_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--<include layout="@layout/settings_jacket" />-->
+
+            <!--<include layout="@layout/settings_jacket" />-->
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="25dp">
+
+            <quarky.com.br.mercuryjacket.ui.view.CustomTextView
+                android:id="@+id/add_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="@string/add_text"
+                android:textColor="@color/blueOne"
+                android:textSize="@dimen/titleSize"
+                app:fontFamily="@string/regular_font"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="bottom">
+
+            <include layout="@layout/divide_clean" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="25dp">
+
+                <quarky.com.br.mercuryjacket.ui.view.CustomTextView
+                    android:id="@+id/intro_bt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="Introduction Tutorial"
+                    android:textColor="@color/blueOne"
+                    android:textSize="@dimen/titleSize"
+                    app:fontFamily="@string/regular_font"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
