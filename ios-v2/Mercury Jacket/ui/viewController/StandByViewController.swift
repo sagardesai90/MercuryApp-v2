@@ -19,6 +19,7 @@ class StandByViewController: BaseViewController {
         self.bluetoothController = BluetoothController.getInstance()
     }
     @IBAction func smart_mode_handle(_ sender: Any) {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         self.bluetoothController.writeCharacteristic(uuid: JacketGattAttributes.MODE,value: JacketGattAttributes.SMART_MODE);
         self.bluetoothController.writeCharacteristic(uuid: JacketGattAttributes.MODE,value: JacketGattAttributes.SMART_MODE);
         self.bluetoothController.readCharacteristics()

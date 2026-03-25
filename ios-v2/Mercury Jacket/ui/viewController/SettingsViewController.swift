@@ -83,14 +83,14 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        var cell = tableView.cellForRow(at: indexPath)
+        let cell = tableView.cellForRow(at: indexPath)
         
         if(cell is NewJacketViewCell)
         {
             return
         }
         
-        var settingCell :SettingViewCell = cell as! SettingViewCell
+        let settingCell :SettingViewCell = cell as! SettingViewCell
         self.cellHeight = Float(settingCell.tableHeight.constant + 200)
         
         switch selectedIndexPath {
@@ -107,7 +107,7 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        var cell = tableView.cellForRow(at: indexPath)
+        let cell = tableView.cellForRow(at: indexPath)
         
         let smallHeight: CGFloat = 60.0
         let expandedHeight: CGFloat = CGFloat(self.cellHeight)
@@ -126,7 +126,7 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
         
         if(cell is SettingViewCell)
         {
-            var settingCell :SettingViewCell = cell as! SettingViewCell
+            let settingCell :SettingViewCell = cell as! SettingViewCell
             
             if(height==smallHeight)
             {
@@ -157,7 +157,7 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
     }
     
     @IBAction func introHandler(_ sender: Any) {
-        var intro : TutorialViewController = AppController.instantiate(id: String(describing: TutorialViewController.self)) as! TutorialViewController;
+        let intro : TutorialViewController = AppController.instantiate(id: String(describing: TutorialViewController.self)) as! TutorialViewController;
         intro.hasBack = true
         AppController.startViewController(viewController: intro)
     }

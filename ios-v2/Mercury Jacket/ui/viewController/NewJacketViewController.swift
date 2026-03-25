@@ -54,7 +54,7 @@ class NewJacketViewController: UIViewController, UITextFieldDelegate {
             self.close_handle(self)
         }
         self.bluetoothController.listenTo(id: TAG, eventName: BluetoothController.Events.ON_SCAN_FOUND) { (param) in
-            self.found(device: param as! CBPeripheral)
+            self.found(device: param as? CBPeripheral)
         }
         self.bluetoothController.listenTo(id:TAG, eventName: BluetoothController.Events.ON_SCAN_NOT_FOUND) {
             self.loader_image.stopAnimatingGif()
@@ -125,10 +125,10 @@ class NewJacketViewController: UIViewController, UITextFieldDelegate {
     {
         if(self.name_txt.text == "")
         {
-            Alert.show(context: self, message: "Enter a name for the jacket.")
+            _ = Alert.show(context: self, message: "Enter a name for the jacket.")
         }else if((self.name_txt.text?.count)!>20)
         {
-            Alert.show(context: self, message: "Max characters 20.")
+            _ = Alert.show(context: self, message: "Max characters 20.")
         }else{
             self.save();
             return true;

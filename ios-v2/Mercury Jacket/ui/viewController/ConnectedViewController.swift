@@ -25,6 +25,7 @@ class ConnectedViewController: BaseViewController {
     
     private var jacket : Jacket!
     private var bluetoothController :BluetoothController!
+    private var batteryLabel: UILabel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,8 +33,40 @@ class ConnectedViewController: BaseViewController {
         ConnectedViewController.instance = self
         
         self.bluetoothController = BluetoothController.getInstance()
-        self.standByViewController = self.subNavigationController.topViewController! as! StandByViewController//AppController.instantiate(id: String(describing: StandByViewController.self)) as! StandByViewController
-        self.runningViewController = AppController.instantiate(id: String(describing: RunningViewController.self)) as! RunningViewController
+        self.standByViewController = self.subNavigationController.topViewController as? StandByViewController
+        self.runningViewController = AppController.instantiate(id: String(describing: RunningViewController.self)) as? RunningViewController
+
+        setupBatteryLabel()
+    }
+
+    private func setupBatteryLabel() {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.font = UIFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium)
+        lbl.textColor = .white
+        lbl.textAlignment = .right
+        lbl.isHidden = true
+        view.addSubview(lbl)
+        NSLayoutConstraint.activate([
+            lbl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            lbl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+        ])
+        batteryLabel = lbl
+    }
+
+    private func updateBatteryDisplay() {
+        let batteryVal = bluetoothController.getValue(uuid: JacketGattAttributes.BATTERY_LEVEL)
+        if batteryVal > 0 {
+            let icon: String
+            if batteryVal > 75 { icon = "🔋" }
+            else if batteryVal > 25 { icon = "🪫" }
+            else { icon = "🪫" }
+            batteryLabel?.text = "\(icon) \(batteryVal)%"
+            batteryLabel?.isHidden = false
+            batteryLabel?.accessibilityLabel = "Battery level: \(batteryVal) percent"
+        } else {
+            batteryLabel?.isHidden = true
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -54,7 +87,9 @@ class ConnectedViewController: BaseViewController {
                 break;
             case JacketGattAttributes.ACTIVITY_LEVEL.uuidString:
                self.setActivityLevel(value: intValue)
-                
+                break;
+            case JacketGattAttributes.BATTERY_LEVEL.uuidString:
+                self.updateBatteryDisplay()
                 break;
             default:
                 break
@@ -62,6 +97,7 @@ class ConnectedViewController: BaseViewController {
         }
         self.setMode(mode: bluetoothController.getValue(uuid: JacketGattAttributes.MODE));
         self.setActivityLevel(value: bluetoothController.getValue(uuid: JacketGattAttributes.ACTIVITY_LEVEL));
+        self.updateBatteryDisplay()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -72,7 +108,7 @@ class ConnectedViewController: BaseViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "embeded" {
-            self.subNavigationController = segue.destination as! UINavigationController
+            self.subNavigationController = segue.destination as? UINavigationController
         }
     }
     
@@ -84,9 +120,11 @@ class ConnectedViewController: BaseViewController {
         {
             self.motion_info_txt.text = String(format: text, "Static")
             self.ic_motion.image = UIImage(named: "ic_static")
+            self.motion_info_txt.accessibilityLabel = "Activity sensor: Static. User is not moving."
         }else{
             self.motion_info_txt.text = String(format: text, "Moving")
             self.ic_motion.image = UIImage(named: "ic_moving")
+            self.motion_info_txt.accessibilityLabel = "Activity sensor: Moving. User is in motion."
         }
     }
     

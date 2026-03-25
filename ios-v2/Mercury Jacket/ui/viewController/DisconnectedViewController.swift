@@ -30,6 +30,10 @@ class DisconnectedViewController: BaseViewController {
         
         self.jacket              = AppController.getCurrentJacket()
         self.bluetoothController = BluetoothController.getInstance()
+
+        connect_bt.accessibilityLabel = "Connect to jacket"
+        connect_bt.accessibilityHint = "Starts scanning for your Mercury jacket"
+        status_txt.accessibilityTraits = .updatesFrequently
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -78,6 +82,7 @@ class DisconnectedViewController: BaseViewController {
             
             status_txt.text = String(format: "Connecting to %@…", self.jacket.name)
             status_txt.textColor = UIColor.white
+            status_txt.accessibilityLabel = "Connecting to \(self.jacket.name)"
             
             loader_image.startAnimatingGif()
             self.jacket_image.image = UIImage(named: "jacket")
@@ -111,6 +116,7 @@ class DisconnectedViewController: BaseViewController {
     private func found()
     {
         if(searching){
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
             self.loader_image.stopAnimatingGif();
             self.loader_image.currentImage = UIImage(named: "loaded_bar")
             self.loader_image.tintColor = UIColor(hexString: "#FA7272")

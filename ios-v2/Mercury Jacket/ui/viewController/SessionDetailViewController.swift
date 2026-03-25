@@ -1,13 +1,14 @@
 import UIKit
 
-class StatsViewController: UIViewController {
+class SessionDetailViewController: UIViewController {
+
+    // MARK: - Input
+
+    var session: Session!
 
     // MARK: - State
 
     private var showTemperature = true
-    private var displaySession: Session?
-    private var isLive = false
-    private var sessionsList: [Session] = []
 
     // MARK: - Views
 
@@ -24,7 +25,7 @@ class StatsViewController: UIViewController {
         return v
     }()
 
-    private lazy var sessionCard: UIView = makeCard()
+    private lazy var statsCard: UIView = makeCard()
 
     private lazy var segmentControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["TEMPERATURE", "HEATING"])
@@ -64,13 +65,7 @@ class StatsViewController: UIViewController {
         return sv
     }()
 
-    private lazy var historyStack: UIStackView = {
-        let sv = UIStackView()
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        sv.axis = .vertical
-        sv.spacing = 8
-        return sv
-    }()
+    private lazy var extraStatsCard: UIView = makeCard()
 
     private lazy var lastUpdateLabel: UILabel = {
         let lbl = UILabel()
@@ -86,33 +81,31 @@ class StatsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = StatsTheme.background
-        title = "STATISTICS"
+
+        let dateFmt = DateFormatter()
+        dateFmt.dateStyle = .medium
+        dateFmt.timeStyle = .short
+        title = dateFmt.string(from: session.startDate)
+
         setupNavBar()
         buildLayout()
-        configureAccessibility()
-    }
-
-    private func configureAccessibility() {
-        segmentControl.accessibilityLabel = "Chart data type"
-        segmentControl.accessibilityHint = "Switch between temperature and heating data"
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
-        refresh()
-        startLiveUpdates()
+        renderAll()
+        if session.isActive { startLiveUpdates() }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
         stopLiveUpdates()
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
 
-    // MARK: - Navigation bar
+    // MARK: - Nav bar
 
     private func setupNavBar() {
         navigationController?.navigationBar.barStyle = .black
@@ -131,17 +124,17 @@ class StatsViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
 
-        let sessionHeader  = makeSectionLabel("LATEST SESSION")
-        let historyHeader  = makeSectionLabel("PAST SESSIONS")
+        let statsHeader = makeSectionLabel("SESSION STATS")
+        let chartHeader = makeSectionLabel("DATA")
 
-        contentView.addSubview(sessionHeader)
-        contentView.addSubview(sessionCard)
+        contentView.addSubview(statsHeader)
+        contentView.addSubview(statsCard)
+        contentView.addSubview(chartHeader)
         contentView.addSubview(segmentControl)
         contentView.addSubview(chartView)
         chartView.addSubview(lastUpdateLabel)
         contentView.addSubview(legendStack)
-        contentView.addSubview(historyHeader)
-        contentView.addSubview(historyStack)
+        contentView.addSubview(extraStatsCard)
 
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -155,15 +148,18 @@ class StatsViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
-            sessionHeader.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
-            sessionHeader.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            statsHeader.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
+            statsHeader.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
 
-            sessionCard.topAnchor.constraint(equalTo: sessionHeader.bottomAnchor, constant: 10),
-            sessionCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            sessionCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            sessionCard.heightAnchor.constraint(equalToConstant: 90),
+            statsCard.topAnchor.constraint(equalTo: statsHeader.bottomAnchor, constant: 10),
+            statsCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            statsCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            statsCard.heightAnchor.constraint(equalToConstant: 90),
 
-            segmentControl.topAnchor.constraint(equalTo: sessionCard.bottomAnchor, constant: 24),
+            chartHeader.topAnchor.constraint(equalTo: statsCard.bottomAnchor, constant: 28),
+            chartHeader.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+
+            segmentControl.topAnchor.constraint(equalTo: chartHeader.bottomAnchor, constant: 10),
             segmentControl.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             segmentControl.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             segmentControl.heightAnchor.constraint(equalToConstant: 36),
@@ -173,50 +169,45 @@ class StatsViewController: UIViewController {
             chartView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             chartView.heightAnchor.constraint(equalToConstant: 250),
 
+            lastUpdateLabel.topAnchor.constraint(equalTo: chartView.topAnchor, constant: 7),
+            lastUpdateLabel.trailingAnchor.constraint(equalTo: chartView.trailingAnchor, constant: -10),
+
             legendStack.topAnchor.constraint(equalTo: chartView.bottomAnchor, constant: 10),
             legendStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
 
-            historyHeader.topAnchor.constraint(equalTo: legendStack.bottomAnchor, constant: 28),
-            historyHeader.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-
-            historyStack.topAnchor.constraint(equalTo: historyHeader.bottomAnchor, constant: 10),
-            historyStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            historyStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            historyStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30),
-
-            lastUpdateLabel.topAnchor.constraint(equalTo: chartView.topAnchor, constant: 7),
-            lastUpdateLabel.trailingAnchor.constraint(equalTo: chartView.trailingAnchor, constant: -10)
+            extraStatsCard.topAnchor.constraint(equalTo: legendStack.bottomAnchor, constant: 20),
+            extraStatsCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            extraStatsCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            extraStatsCard.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
         ])
     }
 
-    // MARK: - Live updates
+    // MARK: - Live updates (active sessions only)
 
     private func startLiveUpdates() {
         let bt = BluetoothController.getInstance()
         guard bt.isConnected() else { return }
-        isLive = true
-        bt.listenTo(id: "StatsViewController", eventName: BluetoothController.Events.ON_UPDATE_CHARACTERISTIC) { [weak self] _ in
-            DispatchQueue.main.async { self?.liveUpdate() }
+
+        bt.listenTo(id: "SessionDetailViewController",
+                    eventName: BluetoothController.Events.ON_UPDATE_CHARACTERISTIC) { [weak self] _ in
+            DispatchQueue.main.async { self?.liveRefresh() }
         }
-        bt.listenTo(id: "StatsViewController", eventName: BluetoothController.Events.ON_DEVICE_DISCONNECTED) { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.isLive = false
-                self?.refresh()
-            }
+        bt.listenTo(id: "SessionDetailViewController",
+                    eventName: BluetoothController.Events.ON_DEVICE_DISCONNECTED) { [weak self] _ in
+            DispatchQueue.main.async { self?.stopLiveUpdates(); self?.renderAll() }
         }
     }
 
     private func stopLiveUpdates() {
-        BluetoothController.getInstance().removeListeners(id: "StatsViewController", eventNameToRemoveOrNil: nil)
-        isLive = false
+        BluetoothController.getInstance()
+            .removeListeners(id: "SessionDetailViewController", eventNameToRemoveOrNil: nil)
     }
 
-    private func liveUpdate() {
-        let logger = SessionLogger.shared
-        if let live = logger.currentSessionForDisplay(), !live.dataPoints.isEmpty {
-            displaySession = live
+    private func liveRefresh() {
+        if let live = SessionLogger.shared.currentSessionForDisplay(), !live.dataPoints.isEmpty {
+            session = live
         }
-        renderSessionCard()
+        renderStatsCard()
         renderChart()
 
         let fmt = DateFormatter()
@@ -232,66 +223,46 @@ class StatsViewController: UIViewController {
         chartView.layer.add(pulse, forKey: "liveFlash")
     }
 
-    // MARK: - Data
+    // MARK: - Render
 
-    private func refresh() {
-        let logger   = SessionLogger.shared
-        let sessions = logger.allSessions()
-
-        if let live = logger.currentSessionForDisplay(), !live.dataPoints.isEmpty {
-            displaySession = live
-            isLive = true
-        } else {
-            displaySession = sessions.first
-            isLive = false
-        }
-
-        renderSessionCard()
+    private func renderAll() {
+        renderStatsCard()
         renderChart()
         renderLegend()
-        renderHistory(sessions: sessions)
+        renderExtraStats()
     }
 
-    // MARK: - Render helpers
-
-    private func renderSessionCard() {
-        sessionCard.subviews.forEach { $0.removeFromSuperview() }
-
-        guard let session = displaySession else {
-            let lbl = makeLabel("No sessions recorded yet",
-                                size: 13, weight: .regular, color: StatsTheme.secondaryText)
-            lbl.textAlignment = .center
-            sessionCard.addSubview(lbl)
-            NSLayoutConstraint.activate([
-                lbl.centerXAnchor.constraint(equalTo: sessionCard.centerXAnchor),
-                lbl.centerYAnchor.constraint(equalTo: sessionCard.centerYAnchor)
-            ])
-            return
-        }
+    private func renderStatsCard() {
+        statsCard.subviews.forEach { $0.removeFromSuperview() }
 
         let useFahrenheit = AppController.getTemperatureMeasure() == AppController.FAHRENHEIT
         let deltaC = session.tempDeltaCelsius
         let deltaStr = useFahrenheit
             ? String(format: "+%.1f°F", deltaC * 9.0 / 5.0)
             : String(format: "+%.1f°C", deltaC)
+        let avgJacket = useFahrenheit
+            ? AppController.celsiusToFahrenheit(value: session.averageJacketTempCelsius)
+            : session.averageJacketTempCelsius
+        let tempUnit = useFahrenheit ? "°F" : "°C"
 
         let statsRow = UIStackView()
         statsRow.translatesAutoresizingMaskIntoConstraints = false
         statsRow.axis = .horizontal
         statsRow.distribution = .fillEqually
-        sessionCard.addSubview(statsRow)
+        statsCard.addSubview(statsRow)
 
         NSLayoutConstraint.activate([
-            statsRow.leadingAnchor.constraint(equalTo: sessionCard.leadingAnchor, constant: 16),
-            statsRow.trailingAnchor.constraint(equalTo: sessionCard.trailingAnchor, constant: -16),
-            statsRow.topAnchor.constraint(equalTo: sessionCard.topAnchor, constant: 14),
-            statsRow.bottomAnchor.constraint(equalTo: sessionCard.bottomAnchor, constant: -14)
+            statsRow.leadingAnchor.constraint(equalTo: statsCard.leadingAnchor, constant: 16),
+            statsRow.trailingAnchor.constraint(equalTo: statsCard.trailingAnchor, constant: -16),
+            statsRow.topAnchor.constraint(equalTo: statsCard.topAnchor, constant: 14),
+            statsRow.bottomAnchor.constraint(equalTo: statsCard.bottomAnchor, constant: -14)
         ])
 
         let items: [(String, String, UIColor)] = [
-            ("DURATION",   formatDuration(session.duration),                               StatsTheme.primaryText),
-            ("AVG POWER",  String(format: "%.1f / 10", session.averagePower0to10),         StatsTheme.accentRed),
-            ("TEMP DELTA", deltaStr,                                                        StatsTheme.accentBlue)
+            ("DURATION",    formatDuration(session.duration),                             StatsTheme.primaryText),
+            ("AVG POWER",   String(format: "%.1f / 10", session.averagePower0to10),       StatsTheme.accentRed),
+            ("TEMP DELTA",  deltaStr,                                                      StatsTheme.accentBlue),
+            ("AVG JACKET",  String(format: "%.1f%@", avgJacket, tempUnit),                StatsTheme.primaryText)
         ]
         items.forEach { statsRow.addArrangedSubview(makeStatCell(title: $0.0, value: $0.1, color: $0.2)) }
 
@@ -300,14 +271,12 @@ class StatsViewController: UIViewController {
             dot.translatesAutoresizingMaskIntoConstraints = false
             dot.backgroundColor = StatsTheme.liveGreen
             dot.layer.cornerRadius = 4
-            sessionCard.addSubview(dot)
-
+            statsCard.addSubview(dot)
             let liveLbl = makeLabel("LIVE", size: 9, weight: .bold, color: StatsTheme.liveGreen)
-            sessionCard.addSubview(liveLbl)
-
+            statsCard.addSubview(liveLbl)
             NSLayoutConstraint.activate([
-                dot.trailingAnchor.constraint(equalTo: sessionCard.trailingAnchor, constant: -14),
-                dot.topAnchor.constraint(equalTo: sessionCard.topAnchor, constant: 10),
+                dot.trailingAnchor.constraint(equalTo: statsCard.trailingAnchor, constant: -14),
+                dot.topAnchor.constraint(equalTo: statsCard.topAnchor, constant: 10),
                 dot.widthAnchor.constraint(equalToConstant: 7),
                 dot.heightAnchor.constraint(equalToConstant: 7),
                 liveLbl.trailingAnchor.constraint(equalTo: dot.leadingAnchor, constant: -4),
@@ -317,9 +286,9 @@ class StatsViewController: UIViewController {
     }
 
     private func renderChart() {
-        guard let session = displaySession, session.dataPoints.count >= 2 else {
+        guard session.dataPoints.count >= 2 else {
             chartView.seriesData = []
-            chartView.noDataMessage = "Connect your jacket to start recording"
+            chartView.noDataMessage = "Not enough data points yet"
             return
         }
 
@@ -351,16 +320,15 @@ class StatsViewController: UIViewController {
             ]
         } else {
             let hasPowerOutput = pts.contains { $0.powerOutputWatts != nil }
-
             if hasPowerOutput {
-                let wattsYs   = pts.map { CGFloat($0.powerOutputWatts ?? 0) }
-                let levelYs   = pts.map { CGFloat($0.powerLevel0to10 * 4.5) }
-                let maxWatts  = max(wattsYs.max() ?? 10, 10)
+                let wattsYs  = pts.map { CGFloat($0.powerOutputWatts ?? 0) }
+                let levelYs  = pts.map { CGFloat($0.powerLevel0to10 * 4.5) }
+                let maxWatts = max(wattsYs.max() ?? 10, 10)
                 chartView.yMin  = 0
                 chartView.yMax  = maxWatts + (maxWatts * 0.1)
                 chartView.yUnit = "W"
                 chartView.seriesData = [
-                    LineChartView.Series(label: "Output (W)", color: StatsTheme.accentRed,  points: wattsYs),
+                    LineChartView.Series(label: "Output (W)", color: StatsTheme.accentRed, points: wattsYs),
                     LineChartView.Series(label: "Set level",  color: UIColor(white: 0.4, alpha: 1), points: levelYs)
                 ]
             } else {
@@ -376,12 +344,9 @@ class StatsViewController: UIViewController {
     }
 
     private func renderLegend() {
-        legendStack.arrangedSubviews.forEach {
-            legendStack.removeArrangedSubview($0)
-            $0.removeFromSuperview()
-        }
+        legendStack.arrangedSubviews.forEach { legendStack.removeArrangedSubview($0); $0.removeFromSuperview() }
 
-        let hasPowerOutput = displaySession?.dataPoints.contains { $0.powerOutputWatts != nil } ?? false
+        let hasPowerOutput = session.dataPoints.contains { $0.powerOutputWatts != nil }
         let heatingItems: [(String, UIColor)] = hasPowerOutput
             ? [("Power Output (W)", StatsTheme.accentRed), ("Set Level", UIColor(white: 0.4, alpha: 1))]
             : [("Heating Level (0–10)", StatsTheme.accentRed)]
@@ -392,16 +357,13 @@ class StatsViewController: UIViewController {
         for (label, color) in items {
             let row = UIView()
             row.translatesAutoresizingMaskIntoConstraints = false
-
             let dot = UIView()
             dot.translatesAutoresizingMaskIntoConstraints = false
             dot.backgroundColor = color
             dot.layer.cornerRadius = 4
             row.addSubview(dot)
-
             let lbl = makeLabel(label, size: 11, weight: .regular, color: StatsTheme.secondaryText)
             row.addSubview(lbl)
-
             NSLayoutConstraint.activate([
                 dot.leadingAnchor.constraint(equalTo: row.leadingAnchor),
                 dot.centerYAnchor.constraint(equalTo: row.centerYAnchor),
@@ -412,40 +374,59 @@ class StatsViewController: UIViewController {
                 lbl.trailingAnchor.constraint(equalTo: row.trailingAnchor),
                 row.heightAnchor.constraint(equalToConstant: 20)
             ])
-
             legendStack.addArrangedSubview(row)
         }
     }
 
-    private func renderHistory(sessions: [Session]) {
-        historyStack.arrangedSubviews.forEach {
-            historyStack.removeArrangedSubview($0)
-            $0.removeFromSuperview()
+    private func renderExtraStats() {
+        extraStatsCard.subviews.forEach { $0.removeFromSuperview() }
+
+        let useFahrenheit = AppController.getTemperatureMeasure() == AppController.FAHRENHEIT
+        let tempUnit = useFahrenheit ? "°F" : "°C"
+
+        func convertTemp(_ c: Float) -> Float {
+            useFahrenheit ? AppController.celsiusToFahrenheit(value: c) : c
         }
 
-        sessionsList = Array(sessions.prefix(20))
+        let dateFmt = DateFormatter()
+        dateFmt.dateStyle = .none
+        dateFmt.timeStyle = .medium
 
-        if sessionsList.isEmpty {
-            let placeholder = UIView()
-            placeholder.translatesAutoresizingMaskIntoConstraints = false
-            placeholder.heightAnchor.constraint(equalToConstant: 70).isActive = true
+        let rows: [(String, String)] = [
+            ("Start time",        dateFmt.string(from: session.startDate)),
+            ("End time",          session.endDate.map { dateFmt.string(from: $0) } ?? "Active"),
+            ("Data points",       "\(session.dataPoints.count)"),
+            ("Avg jacket temp",   String(format: "%.1f%@", convertTemp(session.averageJacketTempCelsius), tempUnit)),
+            ("Avg ambient temp",  String(format: "%.1f%@", convertTemp(session.averageAmbientTempCelsius), tempUnit)),
+            ("Est. energy used",  String(format: "~%.1f Wh", session.estimatedEnergyWh))
+        ]
 
-            let lbl = makeLabel("Connect your jacket to start\nrecording session data.",
-                                size: 13, weight: .regular, color: StatsTheme.secondaryText)
-            lbl.textAlignment = .center
-            lbl.numberOfLines = 0
-            placeholder.addSubview(lbl)
+        var prevAnchor = extraStatsCard.topAnchor
+        var prevConstant: CGFloat = 14
+
+        for (i, (key, val)) in rows.enumerated() {
+            let keyLbl = makeLabel(key, size: 12, weight: .regular, color: StatsTheme.secondaryText)
+            let valLbl = makeLabel(val, size: 12, weight: .medium, color: StatsTheme.primaryText)
+            valLbl.textAlignment = .right
+
+            extraStatsCard.addSubview(keyLbl)
+            extraStatsCard.addSubview(valLbl)
+
             NSLayoutConstraint.activate([
-                lbl.centerXAnchor.constraint(equalTo: placeholder.centerXAnchor),
-                lbl.centerYAnchor.constraint(equalTo: placeholder.centerYAnchor),
-                lbl.leadingAnchor.constraint(greaterThanOrEqualTo: placeholder.leadingAnchor, constant: 20),
-                lbl.trailingAnchor.constraint(lessThanOrEqualTo: placeholder.trailingAnchor, constant: -20)
+                keyLbl.topAnchor.constraint(equalTo: prevAnchor, constant: prevConstant),
+                keyLbl.leadingAnchor.constraint(equalTo: extraStatsCard.leadingAnchor, constant: 16),
+
+                valLbl.centerYAnchor.constraint(equalTo: keyLbl.centerYAnchor),
+                valLbl.trailingAnchor.constraint(equalTo: extraStatsCard.trailingAnchor, constant: -16),
+                valLbl.leadingAnchor.constraint(greaterThanOrEqualTo: keyLbl.trailingAnchor, constant: 8)
             ])
-            historyStack.addArrangedSubview(placeholder)
-        } else {
-            for (index, session) in sessionsList.enumerated() {
-                historyStack.addArrangedSubview(makeSessionRow(session, index: index))
+
+            if i == rows.count - 1 {
+                keyLbl.bottomAnchor.constraint(equalTo: extraStatsCard.bottomAnchor, constant: -14).isActive = true
             }
+
+            prevAnchor = keyLbl.bottomAnchor
+            prevConstant = 12
         }
     }
 
@@ -457,14 +438,7 @@ class StatsViewController: UIViewController {
         renderLegend()
     }
 
-    @objc private func sessionRowTapped(_ sender: UIButton) {
-        guard sender.tag < sessionsList.count else { return }
-        let detail = SessionDetailViewController()
-        detail.session = sessionsList[sender.tag]
-        navigationController?.pushViewController(detail, animated: true)
-    }
-
-    // MARK: - View factories
+    // MARK: - Helpers
 
     private func makeCard() -> UIView {
         let v = UIView()
@@ -504,10 +478,10 @@ class StatsViewController: UIViewController {
         let titleLbl = makeLabel(title, size: 9, weight: .medium, color: StatsTheme.secondaryText)
         titleLbl.textAlignment = .center
 
-        let valueLbl = makeLabel(value, size: 17, weight: .bold, color: color)
+        let valueLbl = makeLabel(value, size: 14, weight: .bold, color: color)
         valueLbl.textAlignment = .center
         valueLbl.adjustsFontSizeToFitWidth = true
-        valueLbl.minimumScaleFactor = 0.65
+        valueLbl.minimumScaleFactor = 0.6
         valueLbl.numberOfLines = 1
 
         container.addSubview(titleLbl)
@@ -526,76 +500,6 @@ class StatsViewController: UIViewController {
 
         return container
     }
-
-    private func makeSessionRow(_ session: Session, index: Int) -> UIView {
-        let card = makeCard()
-        card.heightAnchor.constraint(equalToConstant: 72).isActive = true
-
-        let dateFmt = DateFormatter()
-        dateFmt.dateStyle = .medium
-        dateFmt.timeStyle = .short
-
-        let dateLbl     = makeLabel(dateFmt.string(from: session.startDate),
-                                    size: 13, weight: .medium, color: StatsTheme.primaryText)
-        let durationLbl = makeLabel(formatDuration(session.duration),
-                                    size: 12, weight: .regular, color: StatsTheme.secondaryText)
-        let powerLbl    = makeLabel(String(format: "%.1f / 10", session.averagePower0to10),
-                                    size: 14, weight: .bold, color: StatsTheme.accentRed)
-        powerLbl.textAlignment = .right
-
-        let powerTitle  = makeLabel("AVG POWER", size: 9, weight: .medium, color: StatsTheme.secondaryText)
-        powerTitle.textAlignment = .right
-
-        let energyLbl   = makeLabel(String(format: "~%.1f Wh", session.estimatedEnergyWh),
-                                    size: 11, weight: .regular, color: StatsTheme.secondaryText)
-        energyLbl.textAlignment = .right
-
-        let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
-        chevron.translatesAutoresizingMaskIntoConstraints = false
-        chevron.tintColor = StatsTheme.secondaryText
-        chevron.contentMode = .scaleAspectFit
-
-        for v in [dateLbl, durationLbl, powerLbl, powerTitle, energyLbl, chevron] { card.addSubview(v) }
-
-        NSLayoutConstraint.activate([
-            dateLbl.topAnchor.constraint(equalTo: card.topAnchor, constant: 12),
-            dateLbl.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
-            dateLbl.trailingAnchor.constraint(lessThanOrEqualTo: chevron.leadingAnchor, constant: -8),
-
-            durationLbl.topAnchor.constraint(equalTo: dateLbl.bottomAnchor, constant: 4),
-            durationLbl.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
-
-            powerLbl.topAnchor.constraint(equalTo: card.topAnchor, constant: 12),
-            powerLbl.trailingAnchor.constraint(equalTo: chevron.leadingAnchor, constant: -12),
-
-            powerTitle.topAnchor.constraint(equalTo: powerLbl.bottomAnchor, constant: 2),
-            powerTitle.trailingAnchor.constraint(equalTo: chevron.leadingAnchor, constant: -12),
-
-            energyLbl.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -10),
-            energyLbl.trailingAnchor.constraint(equalTo: chevron.leadingAnchor, constant: -12),
-
-            chevron.centerYAnchor.constraint(equalTo: card.centerYAnchor),
-            chevron.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -14),
-            chevron.widthAnchor.constraint(equalToConstant: 10),
-            chevron.heightAnchor.constraint(equalToConstant: 16)
-        ])
-
-        let tapBtn = UIButton(type: .system)
-        tapBtn.translatesAutoresizingMaskIntoConstraints = false
-        tapBtn.tag = index
-        tapBtn.addTarget(self, action: #selector(sessionRowTapped(_:)), for: .touchUpInside)
-        card.addSubview(tapBtn)
-        NSLayoutConstraint.activate([
-            tapBtn.leadingAnchor.constraint(equalTo: card.leadingAnchor),
-            tapBtn.trailingAnchor.constraint(equalTo: card.trailingAnchor),
-            tapBtn.topAnchor.constraint(equalTo: card.topAnchor),
-            tapBtn.bottomAnchor.constraint(equalTo: card.bottomAnchor)
-        ])
-
-        return card
-    }
-
-    // MARK: - Utility
 
     private func formatDuration(_ duration: TimeInterval) -> String {
         let s = Int(duration)

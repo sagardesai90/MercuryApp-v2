@@ -53,6 +53,13 @@ class RunningViewController: BaseViewController {
         smart_bt.isUserInteractionEnabled = false
         manual_bt.isUserInteractionEnabled = false
         debug_view.isHidden = true
+
+        smart_bt.accessibilityLabel = "Smart mode"
+        smart_bt.accessibilityHint = "Activates automatic temperature adjustment based on activity"
+        manual_bt.accessibilityLabel = "Manual mode"
+        manual_bt.accessibilityHint = "Allows manual control of heating level"
+        info_bt.accessibilityLabel = "About smart mode"
+        slider_bar.accessibilityLabel = "Heating level slider"
         
         let checkInfo = UserDefaults.standard.bool(forKey: "info")
         if(checkInfo)
@@ -144,7 +151,7 @@ class RunningViewController: BaseViewController {
             
             text += "**************************\n"
             
-            var oldText = debug_read_status_txt.text.prefix(1000)
+            let oldText = debug_read_status_txt.text.prefix(1000)
             debug_read_status_txt.text = text+oldText
         }
     }
@@ -153,7 +160,7 @@ class RunningViewController: BaseViewController {
     {
         if(debug)
         {
-            var oldText = debug_write_status_txt.text.prefix(1000)
+            let oldText = debug_write_status_txt.text.prefix(1000)
             debug_write_status_txt.text = text+"\n"+oldText
         }
     }
@@ -199,6 +206,7 @@ class RunningViewController: BaseViewController {
             
             if(self.level != value)
             {
+                UISelectionFeedbackGenerator().selectionChanged()
                 if(!isSmartMode)
                 {
                     self.bluetoothController.writeCharacteristic(uuid: JacketGattAttributes.POWER_LEVEL, value: newPowerLevel)
@@ -222,7 +230,7 @@ class RunningViewController: BaseViewController {
             animTimer.invalidate()
             animTimer = nil
         }
-        var finalValue = max(CGFloat(level/10.0),0.0001)
+        let finalValue = max(CGFloat(level/10.0),0.0001)
         if(animate)
         {
             var value = self.mask_constraint.multiplier
@@ -371,10 +379,12 @@ class RunningViewController: BaseViewController {
     }
     
     @IBAction func smart_handle(_ sender: Any) {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         self.smartMode(update: true)
     }
     
     @IBAction func manual_handle(_ sender: Any) {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         self.manualMode(update: true);
     }
     

@@ -141,7 +141,7 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
         //{
             self.jacket = jacket
             self.settings.removeAll()
-            var settings = jacket.getSettings()
+            let settings = jacket.getSettings()
             let sorted = settings.sorted(by: {$0.0 > $1.0})
             for data in sorted{
                 self.settings.append([data.key,data.value])
@@ -158,7 +158,7 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let config :[Any] = self.settings[indexPath.row]
-        var cell :SettingLineViewCell = self.table_view.dequeueReusableCell(withIdentifier: "line") as! SettingLineViewCell
+        let cell :SettingLineViewCell = self.table_view.dequeueReusableCell(withIdentifier: "line") as! SettingLineViewCell
         cell.setConfig(jacket: jacket!, key: config[0] as! Int, value: config[1] as! Bool);
         return cell
     }
