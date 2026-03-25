@@ -1,19 +1,12 @@
-# Uncomment the next line to define a global platform for your project
-platform :ios, '13.0'
+platform :ios, '15.0'
 inhibit_all_warnings!
 
 target 'Mercury Jacket' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for Mercury Jacket
-  pod 'Alamofire', '~> 4.7'
-  pod 'Firebase/Core'
-  pod 'SwiftyJSON', '~> 4.0'
-  pod 'SwiftyGif'
-  #pod 'RxBluetoothKit'
-  pod 'DottedLineView'
-  pod 'IQKeyboardManager'
+  pod 'Firebase/Core', '~> 10.0'
+  pod 'SwiftyGif', '~> 5.4'
+  pod 'DottedLineView', '~> 2.0'
   pod 'IQKeyboardManager'
 
 end
@@ -21,7 +14,7 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
     end
   end
 end

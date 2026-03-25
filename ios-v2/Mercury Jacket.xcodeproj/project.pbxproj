@@ -10,7 +10,6 @@
 		009C896C4B9F42DD2C72CEBF /* Pods_Mercury_Jacket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7D21E02BD20052AA19 /* Pods_Mercury_Jacket.framework */; };
 		128121AF21EFAF990020E8E7 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 128121AE21EFAF990020E8E7 /* SafariServices.framework */; };
 		12B2DEC82368D6AF0091FFA7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B2DEC72368D6AF0091FFA7 /* Security.framework */; };
-		12B2DEC92368D6B80091FFA7 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 128121AE21EFAF990020E8E7 /* SafariServices.framework */; };
 		12BBFE6E21E02BC70052AA19 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE6D21E02BC70052AA19 /* Alamofire.framework */; };
 		12BBFE7021E02BC70052AA19 /* DottedLineView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE6F21E02BC70052AA19 /* DottedLineView.framework */; };
 		12BBFE7221E02BC70052AA19 /* FirebaseCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7121E02BC70052AA19 /* FirebaseCore.framework */; };
@@ -63,6 +62,15 @@
 		AA00000100000002 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000002 /* Session.swift */; };
 		AA00000100000003 /* SessionLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000003 /* SessionLogger.swift */; };
 		AA00000100000004 /* StatsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000004 /* StatsViewController.swift */; };
+		AA00000100000005 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000005 /* AppEnvironment.swift */; };
+		AA00000100000006 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000006 /* SessionStore.swift */; };
+		AA00000100000007 /* JacketStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000007 /* JacketStore.swift */; };
+		AA00000100000008 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000008 /* WeatherService.swift */; };
+		AA00000100000009 /* BLEEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000009 /* BLEEvent.swift */; };
+		AA0000010000000A /* AlexaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000A /* AlexaService.swift */; };
+		AA0000010000000B /* SessionDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000B /* SessionDetailViewController.swift */; };
+		AA0000010000000C /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000C /* LineChartView.swift */; };
+		AA0000010000000D /* StatsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000D /* StatsTheme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -136,6 +144,15 @@
 		AA00000200000002 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		AA00000200000003 /* SessionLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionLogger.swift; sourceTree = "<group>"; };
 		AA00000200000004 /* StatsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewController.swift; sourceTree = "<group>"; };
+		AA00000200000005 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		AA00000200000006 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		AA00000200000007 /* JacketStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JacketStore.swift; sourceTree = "<group>"; };
+		AA00000200000008 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		AA00000200000009 /* BLEEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEEvent.swift; sourceTree = "<group>"; };
+		AA0000020000000A /* AlexaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlexaService.swift; sourceTree = "<group>"; };
+		AA0000020000000B /* SessionDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailViewController.swift; sourceTree = "<group>"; };
+		AA0000020000000C /* LineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChartView.swift; sourceTree = "<group>"; };
+		AA0000020000000D /* StatsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsTheme.swift; sourceTree = "<group>"; };
 		BE89836DAB02AA79585860DD /* Pods-Mercury Jacket.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mercury Jacket.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -149,7 +166,6 @@
 				12BBFE7021E02BC70052AA19 /* DottedLineView.framework in Frameworks */,
 				12BBFE7221E02BC70052AA19 /* FirebaseCore.framework in Frameworks */,
 				12BBFE7421E02BC70052AA19 /* GoogleUtilities.framework in Frameworks */,
-				12B2DEC92368D6B80091FFA7 /* SafariServices.framework in Frameworks */,
 				12BBFE7621E02BC70052AA19 /* IQKeyboardManager.framework in Frameworks */,
 				12BBFE7821E02BC70052AA19 /* nanopb.framework in Frameworks */,
 				12BBFE7A21E02BC70052AA19 /* SwiftyGif.framework in Frameworks */,
@@ -268,6 +284,12 @@
 				53D63D5121BF56D800D6452D /* AppController.swift */,
 				12E3373221CA8432004C2B8B /* JacketGattAttributes.swift */,
 				AA00000200000003 /* SessionLogger.swift */,
+				AA00000200000005 /* AppEnvironment.swift */,
+				AA00000200000006 /* SessionStore.swift */,
+				AA00000200000007 /* JacketStore.swift */,
+				AA00000200000008 /* WeatherService.swift */,
+				AA00000200000009 /* BLEEvent.swift */,
+				AA0000020000000A /* AlexaService.swift */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -327,6 +349,7 @@
 				5326DABF21C0F54900F6A0AC /* ConnectedViewController.swift */,
 				5326DAC121C1114900F6A0AC /* SettingsViewController.swift */,
 				AA00000200000004 /* StatsViewController.swift */,
+				AA0000020000000B /* SessionDetailViewController.swift */,
 			);
 			path = viewController;
 			sourceTree = "<group>";
@@ -354,6 +377,8 @@
 			isa = PBXGroup;
 			children = (
 				5313C6CA21C1597F00AE5C9E /* RoundedButton.swift */,
+				AA0000020000000C /* LineChartView.swift */,
+				AA0000020000000D /* StatsTheme.swift */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -395,8 +420,9 @@
 		5310144721BAAF3B00C0883E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1010;
-				LastUpgradeCheck = 1010;
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 2630;
 				ORGANIZATIONNAME = Cappen;
 				TargetAttributes = {
 					5310144E21BAAF3B00C0883E = {
@@ -528,6 +554,15 @@
 				AA00000100000002 /* Session.swift in Sources */,
 				AA00000100000003 /* SessionLogger.swift in Sources */,
 				AA00000100000004 /* StatsViewController.swift in Sources */,
+				AA00000100000005 /* AppEnvironment.swift in Sources */,
+				AA00000100000006 /* SessionStore.swift in Sources */,
+				AA00000100000007 /* JacketStore.swift in Sources */,
+				AA00000100000008 /* WeatherService.swift in Sources */,
+				AA00000100000009 /* BLEEvent.swift in Sources */,
+				AA0000010000000A /* AlexaService.swift in Sources */,
+				AA0000010000000B /* SessionDetailViewController.swift in Sources */,
+				AA0000010000000C /* LineChartView.swift in Sources */,
+				AA0000010000000D /* StatsTheme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -557,6 +592,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -579,6 +615,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -587,9 +624,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6H32287PP9;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -609,6 +649,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -618,6 +659,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -640,6 +682,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -648,9 +691,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6H32287PP9;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -663,6 +709,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
@@ -677,7 +724,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 7;
-				DEVELOPMENT_TEAM = 6H32287PP9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Mercury\\ Jacket/libs",
@@ -706,7 +752,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 7;
-				DEVELOPMENT_TEAM = 6H32287PP9;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Mercury\\ Jacket/libs",
