@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+
+gem "ffi", "< 1.17"
+gem "cocoapods", "1.12.1"
