@@ -1,30 +1,30 @@
-//
-//  BluetoothController.swift
-//  MercuryJacket
-//
-//  Created by André Ponce on 12/11/2018.
-//  Copyright © 2018 Quarky. All rights reserved.
-//
-
 import UIKit
 import CoreBluetooth
-import LoginWithAmazon
-import SwiftyJSON
-import Alamofire
+import Combine
 
-class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, AIAuthenticationDelegate {
+class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, AlexaServiceDelegate {
 
     private let TAG: String = "BluetoothController"
-    // Accept any Mercury-branded device name (e.g. "Mercury Jacket", "Mercury Vest", "Mercury Pro", etc.)
     private func isMercuryDevice(name: String) -> Bool {
         return name.lowercased().hasPrefix("mercury")
     }
     private let SCAN_TIME: Int = 20
     private let READ_TIME: Int = 3
-    private let ALEXA_URL: String = "https://x0i55e3ypk.execute-api.us-east-1.amazonaws.com/prod/?email=%@"
 
     private static var instance: BluetoothController?
 
+    // MARK: - Combine publishers (modern alternative to EventManager)
+
+    let deviceConnectedPublisher = PassthroughSubject<String, Never>()
+    let deviceDisconnectedPublisher = PassthroughSubject<(deviceID: String, tryReconnect: Bool), Never>()
+    let characteristicUpdatedPublisher = PassthroughSubject<(deviceID: String, uuid: CBUUID, value: String), Never>()
+    let servicesDiscoveredPublisher = PassthroughSubject<String, Never>()
+    let scanFoundPublisher = PassthroughSubject<CBPeripheral, Never>()
+    let scanNotFoundPublisher = PassthroughSubject<Void, Never>()
+    let adapterStatePublisher = PassthroughSubject<Bool, Never>()
+    let deviceConnectingPublisher = PassthroughSubject<String, Never>()
+
+    // Legacy string-based event names (kept for backward compatibility)
     class Events {
         public static var ON_ADAPTER_CONNECT: String       = "onAdapterConnect"
         public static var ON_ADAPTER_DISCONNECT: String    = "onAdapterDisconnect"
@@ -42,7 +42,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     private var eventsManager: EventManager = EventManager()
     private var manager: CBCentralManager!
 
-    // Per-device state keyed by CBPeripheral.identifier.uuidString
     private var devices: [String: CBPeripheral] = [:]
     private var characteristicsDic: [String: [CBUUID: CBCharacteristic]] = [:]
     private var characteristicValuesDic: [String: [CBUUID: String]] = [:]
@@ -51,25 +50,25 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     private var readTimers: [String: Timer] = [:]
 
     private var connectedDeviceIDs: Set<String> = []
-    private var pendingConnectionIDs: Set<String> = []     // known UUIDs awaiting BLE connect
-    private var cancellingForReconnect: Set<String> = []   // devices cancelled to force fresh BLE handshake
-    private var pairingErrorCounts: [String: Int] = [:]    // tracks consecutive error-14 failures per device
+    private var pendingConnectionIDs: Set<String> = []
+    private var cancellingForReconnect: Set<String> = []
+    private var pairingErrorCounts: [String: Int] = [:]
     private let MAX_PAIRING_RETRIES = 3
-    private var connectionStartTimes: [String: Date] = [:] // tracks when each device connected
+    private var connectionStartTimes: [String: Date] = [:]
     private var scanning: Bool = false
-    private var scanningForNew: Bool = false              // scanning for an unregistered new device
+    private var scanningForNew: Bool = false
 
     private var scanTimer: Timer?
     private var adapterAlert: Alert!
 
-    private var amazon_email: String? = nil
-    private var amazonQueue: DataRequest? = nil
+    private let alexaService: AlexaService
 
     public var adapterIsEnabled: Bool = false
 
     // MARK: - Lifecycle
 
-    override init() {
+    init(alexaService: AlexaService) {
+        self.alexaService = alexaService
         super.init()
         print("BluetoothController constructor")
         BluetoothController.instance = self
@@ -86,7 +85,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
 
     // MARK: - Public API
 
-    /// Returns the cached value for the currently-selected jacket's characteristic.
     public func getValue(uuid: CBUUID) -> Int {
         return getValue(uuid: uuid, deviceID: AppController.getCurrentJacket()?.id)
     }
@@ -96,7 +94,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         return Int(characteristicValuesDic[id]?[uuid] ?? "0") ?? 0
     }
 
-    /// True when the currently-selected jacket is BLE-connected.
     public func isConnected() -> Bool {
         guard let id = AppController.getCurrentJacket()?.id else { return false }
         return connectedDeviceIDs.contains(id)
@@ -124,6 +121,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
             print("Bluetooth is on.")
             self.adapterIsEnabled = true
             self.eventsManager.trigger(eventName: Events.ON_ADAPTER_CONNECT)
+            self.adapterStatePublisher.send(true)
             if adapterAlert != nil {
                 adapterAlert.dismiss()
                 adapterAlert = nil
@@ -132,10 +130,12 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
             print("Bluetooth is Off.")
             self.adapterIsEnabled = false
             self.eventsManager.trigger(eventName: Events.ON_ADAPTER_DISCONNECT)
+            self.adapterStatePublisher.send(false)
             for deviceID in Array(connectedDeviceIDs) {
                 stopDeviceConnection(deviceID: deviceID)
                 eventsManager.trigger(eventName: Events.ON_DEVICE_DISCONNECTED,
                                       information: [deviceID, true] as [AnyObject])
+                deviceDisconnectedPublisher.send((deviceID: deviceID, tryReconnect: true))
             }
             adapterAlert = Alert(context: AppController.getContext())
             adapterAlert.create(message: "Bluetooth is required to use this app, would you like to continue using this app?", type: Alert.ASK)
@@ -158,7 +158,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         let peripheralID = peripheral.identifier.uuidString
         print("SCANNED", peripheral.name ?? "<no name>", peripheralID.prefix(8))
 
-        // Reconnect to a known registered device
         if pendingConnectionIDs.contains(peripheralID) && !connectedDeviceIDs.contains(peripheralID) {
             pendingConnectionIDs.remove(peripheralID)
             connect(peripheral: peripheral)
@@ -170,15 +169,13 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
             return
         }
 
-        // New device pairing — match by BLE name prefix OR Mercury service UUID in advertisement,
-        // to handle firmware variants that don't include the device name in the advertisement packet.
         if scanningForNew {
             let name = peripheral.name ?? ""
             let advertisedServiceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID] ?? []
             let looksLikeMercury = isMercuryDevice(name: name)
                 || advertisedServiceUUIDs.contains(JacketGattAttributes.serviceCBUUID)
             if looksLikeMercury {
-                let saved = UserDefaults.standard.dictionary(forKey: AppController.KEY_JACKETS) as? [String: String]
+                let saved = UserDefaults.standard.dictionary(forKey: BluetoothController.KEY_JACKETS) as? [String: String]
                 if saved == nil || saved![peripheralID] == nil {
                     print("DEVICE FOUND", "Name: \"\(name.isEmpty ? "<no name>" : name)\", Identifier: \(peripheralID)")
                     scanningForNew = false
@@ -188,6 +185,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
                         stopScanTimer()
                     }
                     eventsManager.trigger(eventName: Events.ON_SCAN_FOUND, information: peripheral)
+                    scanFoundPublisher.send(peripheral)
                 }
             }
         }
@@ -202,11 +200,11 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         devices[deviceID] = peripheral
         connectionStartTimes[deviceID] = Date()
         peripheral.delegate = self
-        pairingErrorCounts.removeValue(forKey: deviceID)  // successful connect clears error streak
+        pairingErrorCounts.removeValue(forKey: deviceID)
         if characteristicValuesDic[deviceID] == nil { characteristicValuesDic[deviceID] = [:] }
 
-        // Event carries deviceID so listeners can filter by their specific jacket
         eventsManager.trigger(eventName: Events.ON_DEVICE_CONNECTED, information: deviceID)
+        deviceConnectedPublisher.send(deviceID)
         peripheral.discoverServices([JacketGattAttributes.serviceCBUUID])
 
         if pendingConnectionIDs.isEmpty && !scanningForNew && scanning {
@@ -220,11 +218,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         let errorCode = (error as NSError?)?.code ?? -1
         print("Failed to connect \(deviceID.prefix(8)) error code \(errorCode):", error as Any)
 
-        // CBError code 14 — "Peer removed pairing information": the vest cleared its bonding
-        // cache (firmware bug). iOS is trying to reconnect with stale keys that the vest
-        // no longer recognizes. Retry a few times in case iOS re-initiates fresh pairing,
-        // but give up after MAX_PAIRING_RETRIES and tell the user to forget the device in
-        // iOS Settings → Bluetooth so a clean pairing can be established.
         if errorCode == 14 {
             let count = (pairingErrorCounts[deviceID] ?? 0) + 1
             pairingErrorCounts[deviceID] = count
@@ -235,14 +228,11 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
                 }
                 return
             }
-            // Exhausted retries — iOS is stuck with stale bonding keys. The user must
-            // forget the device in iOS Settings → Bluetooth so iOS clears its bond store.
             print("Pairing retries exhausted for \(deviceID.prefix(8)) — prompting user to forget device")
             pairingErrorCounts.removeValue(forKey: deviceID)
             pendingConnectionIDs.remove(deviceID)
-            // Look up the user-assigned name for a friendlier error message
             let jacketName: String = {
-                if let raw = UserDefaults.standard.dictionary(forKey: AppController.KEY_JACKETS)?[deviceID] as? String,
+                if let raw = UserDefaults.standard.dictionary(forKey: "jackets")?[deviceID] as? String,
                    let data = raw.data(using: .utf8),
                    let jacket = try? JSONDecoder().decode(Jacket.self, from: data) {
                     return jacket.name
@@ -259,6 +249,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
                 alert.show()
             }
             eventsManager.trigger(eventName: Events.ON_SCAN_NOT_FOUND)
+            scanNotFoundPublisher.send()
             return
         }
 
@@ -276,8 +267,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         print("Disconnected from peripheral:", deviceID.prefix(8),
               String(format: "(after %.1fs)", duration))
 
-        // If we intentionally cancelled this peripheral to force a fresh reconnect,
-        // now that the cancel is confirmed complete, proceed with the actual connect.
         if cancellingForReconnect.contains(deviceID) {
             cancellingForReconnect.remove(deviceID)
             print("Stale cancel complete — reconnecting \(deviceID.prefix(8))")
@@ -288,9 +277,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         guard connectedDeviceIDs.contains(deviceID) else { return }
         stopDeviceConnection(deviceID: deviceID)
 
-        // If the vest dropped within 5 seconds of connecting it's almost certainly the
-        // firmware variable-scope bug. Retry silently so the UI doesn't show the error
-        // alert — the vest should reconnect cleanly on the next attempt.
         if duration < 5.0 {
             print("Quick disconnect — silent retry for \(deviceID.prefix(8))")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -300,6 +286,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         } else {
             eventsManager.trigger(eventName: Events.ON_DEVICE_DISCONNECTED,
                                   information: [deviceID, true] as [AnyObject])
+            deviceDisconnectedPublisher.send((deviceID: deviceID, tryReconnect: true))
         }
     }
 
@@ -326,13 +313,10 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
             JacketGattAttributes.POWER_LEVEL,
             JacketGattAttributes.POWER_OUTPUT,
             JacketGattAttributes.SAVE_NV_SETTINGS,
-            JacketGattAttributes.MOTION_TEMP
+            JacketGattAttributes.MOTION_TEMP,
+            JacketGattAttributes.BATTERY_LEVEL
         ]
 
-        // Settle delay before characteristic discovery — the vest firmware has a variable-scope
-        // bug where the registration variable is still being initialized during service discovery.
-        // Calling discoverCharacteristics immediately causes the firmware to crash and drop the
-        // connection. 800ms gives the firmware time to finish its own setup.
         let serviceRef = services[0]
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             guard self.connectedDeviceIDs.contains(deviceID) else { return }
@@ -359,6 +343,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         }
 
         eventsManager.trigger(eventName: Events.ON_SERVICES_DICOVERED, information: deviceID)
+        servicesDiscoveredPublisher.send(deviceID)
         startReadTimer(deviceID: deviceID)
         readCharacteristics(deviceID: deviceID)
     }
@@ -383,6 +368,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
                 stopDeviceConnection(deviceID: deviceID)
                 eventsManager.trigger(eventName: Events.ON_DEVICE_DISCONNECTED,
                                       information: [deviceID, false] as [AnyObject])
+                deviceDisconnectedPublisher.send((deviceID: deviceID, tryReconnect: false))
             } else {
                 readCharacteristic(uuid: characteristic.uuid, deviceID: deviceID)
             }
@@ -395,8 +381,8 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     }
 
     func peripheral(_ peripheral: CBPeripheral,
-                    didUpdateNotificationStateForCharacteristic characteristic: CBCharacteristic,
-                    error: NSError?) {
+                    didUpdateNotificationStateFor characteristic: CBCharacteristic,
+                    error: Error?) {
         if let error = error {
             print("notify error:", error)
         } else {
@@ -452,9 +438,9 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         print(JacketGattAttributes.getName(uuid: characteristic.uuid), "=", value,
               "[\(deviceID.prefix(8))]")
         characteristicValuesDic[deviceID]![characteristic.uuid] = value
-        // Payload: [deviceID, CBUUID, valueString] — listeners filter by deviceID if needed
         eventsManager.trigger(eventName: Events.ON_UPDATE_CHARACTERISTIC,
                               information: [deviceID, characteristic.uuid, value] as [AnyObject])
+        characteristicUpdatedPublisher.send((deviceID: deviceID, uuid: characteristic.uuid, value: value))
     }
 
     private func readCharacteristics(deviceID: String) {
@@ -466,7 +452,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         }
     }
 
-    /// Triggers a read-all for the currently-selected jacket (called from StandByViewController).
     public func readCharacteristics() {
         readCharacteristics(deviceID: AppController.getCurrentJacket()?.id ?? "")
     }
@@ -520,8 +505,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
 
     // MARK: - Scanning & Connecting
 
-    /// Scans for a new (unregistered) device when called with no argument.
-    /// Pass an existing jacket ID to reconnect a single known device (legacy path).
     func scanDevice(id: String? = nil) {
         if let deviceID = id {
             guard !connectedDeviceIDs.contains(deviceID) else { return }
@@ -552,10 +535,8 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         }
     }
 
-    /// Connects to ALL registered jackets that are not yet connected.
-    /// Call this from DisconnectedViewController / app startup instead of scanDevice(id:).
     public func connectAllRegistered() {
-        guard let saved = UserDefaults.standard.dictionary(forKey: AppController.KEY_JACKETS)
+        guard let saved = UserDefaults.standard.dictionary(forKey: "jackets")
                 as? [String: String] else { return }
 
         let unconnectedIDs = Set(saved.keys)
@@ -566,9 +547,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
 
         startScanTimer()
 
-        // For devices that appear stale (connected at iOS level but not in our app state),
-        // cancel first and reconnect once didDisconnectPeripheral confirms the cancel completed.
-        // Connecting immediately after cancel is a race condition that drops the second device.
         let staleConnected = manager.retrieveConnectedPeripherals(withServices: [JacketGattAttributes.serviceCBUUID])
         var staleIDs = Set<String>()
         for p in staleConnected where unconnectedIDs.contains(p.identifier.uuidString) {
@@ -577,11 +555,9 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
             manager.cancelPeripheralConnection(p)
         }
 
-        // Connect all non-stale unconnected devices immediately
         connectByIDs(Set(unconnectedIDs).subtracting(staleIDs))
     }
 
-    /// Looks up cached peripherals for the given IDs and connects; starts a scan for any not cached.
     private func connectByIDs(_ ids: Set<String>) {
         guard !ids.isEmpty else { return }
         let uuids = ids.compactMap { UUID(uuidString: $0) }
@@ -608,6 +584,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         devices[deviceID] = peripheral
         peripheral.delegate = self
         eventsManager.trigger(eventName: Events.ON_DEVICE_CONNECTING, information: deviceID)
+        deviceConnectingPublisher.send(deviceID)
         manager.connect(peripheral, options: nil)
     }
 
@@ -620,7 +597,6 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         stopScanTimer()
     }
 
-    /// Stops ALL active connections and clears all state.
     public func stopConnection() {
         for deviceID in Array(connectedDeviceIDs) { stopDeviceConnection(deviceID: deviceID) }
         for deviceID in Array(pendingConnectionIDs) {
@@ -629,23 +605,18 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         }
         pendingConnectionIDs.removeAll()
         stopScan()
-        amazonQueue?.cancel()
-        amazonQueue = nil
+        alexaService.reset()
     }
 
-    /// Stops the connection for a single specific device (e.g. explicit user disconnect).
     public func stopConnection(deviceID: String) {
         let wasConnected = connectedDeviceIDs.contains(deviceID)
         stopDeviceConnection(deviceID: deviceID)
         pendingConnectionIDs.remove(deviceID)
         if connectedDeviceIDs.isEmpty && pendingConnectionIDs.isEmpty { stopScan() }
-        // Fire disconnect event so the UI (DashBoardViewController → DisconnectedViewController)
-        // knows to show the reconnect screen. stopDeviceConnection removes the device from
-        // connectedDeviceIDs before cancelPeripheralConnection fires didDisconnectPeripheral,
-        // so didDisconnectPeripheral's guard exits early and won't fire this event itself.
         if wasConnected {
             eventsManager.trigger(eventName: Events.ON_DEVICE_DISCONNECTED,
                                   information: [deviceID, true] as [AnyObject])
+            deviceDisconnectedPublisher.send((deviceID: deviceID, tryReconnect: true))
         }
     }
 
@@ -693,10 +664,9 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         let wasNewScan = scanningForNew
         let currentID = AppController.getCurrentJacket()?.id
         stopScan()
-        // Always fire when scanning for a new device (Add new jacket flow).
-        // Also fire when the current jacket itself isn't connected yet.
         if wasNewScan || (currentID != nil && !connectedDeviceIDs.contains(currentID!)) {
             eventsManager.trigger(eventName: Events.ON_SCAN_NOT_FOUND)
+            scanNotFoundPublisher.send()
         }
     }
 
@@ -714,51 +684,22 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         eventsManager.removeListeners(id: id, eventNameToRemoveOrNil: eventNameToRemoveOrNil)
     }
 
-    // MARK: - Alexa / Voice
+    // MARK: - Alexa / Voice (delegated to AlexaService)
 
     private func checkVoiceControl() {
         guard let jacket = AppController.getCurrentJacket() else { return }
         let voiceControl: Bool = jacket.getSetting(key: Jacket.VOICE_CONTROL)
-        if voiceControl && amazon_email == nil {
-            AIMobileLib.getProfile(self)
-        } else if amazon_email != nil && !voiceControl {
-            amazon_email = nil
-        } else if amazon_email != nil && voiceControl {
-            loadAlexaStatus()
-        }
+        alexaService.checkVoiceControl(voiceEnabled: voiceControl)
     }
 
-    private func loadAlexaStatus() {
-        guard amazonQueue == nil else { return }
-        let url = String(format: ALEXA_URL, amazon_email!)
-        print("URL_GET_STATUS", url)
-        amazonQueue = Alamofire.request(url, method: .get)
-            .responseJSON { response in
-                self.amazonQueue = nil
-                switch response.result {
-                case .success:
-                    let statusJson = JSON(response.data!)["jacketStatus"]
-                    let status: Int = statusJson.exists() ? statusJson.intValue : -1
-                    print("JACKETSTATUS", status)
-                    if status > -1 {
-                        self.writeCharacteristic(uuid: JacketGattAttributes.MODE, value: status)
-                        self.writeCharacteristic(uuid: JacketGattAttributes.MODE, value: status)
-                    }
-                case .failure:
-                    print("jacketStatus error")
-                }
-            }
+    // MARK: - AlexaServiceDelegate
+
+    func alexaService(_ service: AlexaService, didReceiveMode mode: Int) {
+        writeCharacteristic(uuid: JacketGattAttributes.MODE, value: mode)
+        writeCharacteristic(uuid: JacketGattAttributes.MODE, value: mode)
     }
 
-    func requestDidSucceed(_ apiResult: APIResult!) {
-        DispatchQueue.main.async {
-            self.amazon_email = (apiResult?.result as? [AnyHashable: Any])?["email"] as? String
-            print("AMAZON_RESULT", apiResult?.result as Any)
-            if self.amazon_email != nil { self.loadAlexaStatus() }
-        }
-    }
-
-    func requestDidFail(_ errorResponse: APIError!) {
-        print("Error:", errorResponse.error.message ?? "nil")
-    }
+    // MARK: - Legacy key for scan discovery
+    // Used by centralManager(_:didDiscover:) to check saved jackets
+    private static let KEY_JACKETS = "jackets"
 }

@@ -2,19 +2,20 @@ import Foundation
 
 class SessionLogger {
 
-    static let shared = SessionLogger()
-    private init() {}
+    static var shared = SessionLogger()
 
-    private let storageKey = "mj_session_history_v1"
+    private let sessionStore: SessionStore
     private var logTimer: Timer?
     private(set) var currentSession: Session?
     private(set) var ambientTempCelsius: Float = 0
 
-    // Called once from AppController.setup() after BluetoothController is created.
+    init(sessionStore: SessionStore = UserDefaultsSessionStore()) {
+        self.sessionStore = sessionStore
+    }
+
     func start() {
         let bt = BluetoothController.getInstance()
         bt.listenTo(id: "SessionLogger", eventName: BluetoothController.Events.ON_DEVICE_CONNECTED) { (param) in
-            // Only log sessions for the currently-selected jacket
             guard let deviceID = param as? String,
                   deviceID == AppController.getCurrentJacket()?.id else { return }
             self.beginSession()
@@ -29,7 +30,6 @@ class SessionLogger {
         }
     }
 
-    // Updated by DashBoardViewController whenever weather or jacket temp changes.
     func updateAmbientTemp(celsius: Float) {
         ambientTempCelsius = celsius
     }
@@ -62,7 +62,7 @@ class SessionLogger {
         }
         session.endDate = Date()
         currentSession = nil
-        persist(session: session)
+        sessionStore.persist(session: session)
     }
 
     private func logDataPoint() {
@@ -82,8 +82,6 @@ class SessionLogger {
         currentSession?.dataPoints.append(point)
     }
 
-    /// Returns the current session with an extra live data point appended for
-    /// real-time display. The live point is NOT saved to UserDefaults.
     func currentSessionForDisplay() -> Session? {
         guard var session = currentSession else { return nil }
         let bt = BluetoothController.getInstance()
@@ -103,22 +101,9 @@ class SessionLogger {
         return session
     }
 
-    // MARK: - Persistence
-
-    private func persist(session: Session) {
-        var all = allSessions()
-        all.insert(session, at: 0)
-        all = Array(all.prefix(30))
-        if let data = try? JSONEncoder().encode(all) {
-            UserDefaults.standard.set(data, forKey: storageKey)
-        }
-    }
+    // MARK: - Read
 
     func allSessions() -> [Session] {
-        guard let data = UserDefaults.standard.data(forKey: storageKey),
-              let sessions = try? JSONDecoder().decode([Session].self, from: data) else {
-            return []
-        }
-        return sessions
+        sessionStore.allSessions()
     }
 }

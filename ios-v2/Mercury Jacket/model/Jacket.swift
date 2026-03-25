@@ -45,7 +45,7 @@ class Jacket :Codable {
         if(settings != nil)
         {
             for setting in tempSettings{
-                if let val = settings![setting.key] {
+                if settings![setting.key] != nil {
                     tempSettings[setting.key] = settings![setting.key];
                 }
             }
@@ -68,16 +68,20 @@ class Jacket :Codable {
         AppController.removeJacket(jacket: self);
     }
     
+    /// Updates the setting and syncs to BLE + persistence.
     public func updateSetting(key :Int, value :Bool)
     {
         if(BluetoothController.getInstance().isConnected() && key==Jacket.MOTION_CONTROL)
         {
             BluetoothController.getInstance().writeCharacteristic(uuid: JacketGattAttributes.MOTION_TEMP, value: value ? 1 : 0);
         }
-        
-        //need this
-        getSettings();
-        self.settings![key] = value
+        updateSettingLocal(key: key, value: value)
         save();
+    }
+
+    /// Updates only the in-memory setting without touching BLE or persistence.
+    public func updateSettingLocal(key: Int, value: Bool) {
+        _ = getSettings()
+        self.settings![key] = value
     }
 }
