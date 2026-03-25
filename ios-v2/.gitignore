@@ -1,2 +1,3 @@
 # Bundler — install with: bundle install
 vendor/bundle/
+.bundle/
