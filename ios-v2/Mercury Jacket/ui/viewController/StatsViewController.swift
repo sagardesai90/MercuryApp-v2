@@ -344,7 +344,7 @@ class StatsViewController: UIViewController {
     private func renderChart() {
         guard let session = displaySession, session.dataPoints.count >= 2 else {
             chartView.seriesData = []
-            chartView.noDataMessage = "Connect your jacket to start recording"
+            chartView.noDataMessage = "Connect your Mercury device to start recording"
             return
         }
 
@@ -371,7 +371,7 @@ class StatsViewController: UIViewController {
             chartView.yMax  = (allY.max() ?? 30) + 2
             chartView.yUnit = useFahrenheit ? "°F" : "°C"
             chartView.seriesData = [
-                LineChartView.Series(label: "Jacket",  color: StatsTheme.accentRed,  points: jacketYs),
+                LineChartView.Series(label: "Garment",  color: StatsTheme.accentRed,  points: jacketYs),
                 LineChartView.Series(label: "Outside", color: StatsTheme.accentBlue, points: ambientYs)
             ]
         } else {
@@ -411,7 +411,7 @@ class StatsViewController: UIViewController {
             ? [("Power Output (W)", StatsTheme.accentRed), ("Set Level", UIColor(white: 0.4, alpha: 1))]
             : [("Heating Level (0–10)", StatsTheme.accentRed)]
         let items: [(String, UIColor)] = showTemperature
-            ? [("Jacket Temp", StatsTheme.accentRed), ("Outside Temp", StatsTheme.accentBlue)]
+            ? [("Garment", StatsTheme.accentRed), ("Outside", StatsTheme.accentBlue)]
             : heatingItems
 
         for (label, color) in items {
@@ -455,7 +455,7 @@ class StatsViewController: UIViewController {
             placeholder.translatesAutoresizingMaskIntoConstraints = false
             placeholder.heightAnchor.constraint(equalToConstant: 70).isActive = true
 
-            let lbl = makeLabel("Connect your jacket to start\nrecording session data.",
+            let lbl = makeLabel("Connect your Mercury device to start\nrecording session data.",
                                 size: 13, weight: .regular, color: StatsTheme.secondaryText)
             lbl.textAlignment = .center
             lbl.numberOfLines = 0

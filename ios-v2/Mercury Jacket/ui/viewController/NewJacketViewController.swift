@@ -12,8 +12,8 @@ import CoreBluetooth
 
 class NewJacketViewController: UIViewController, UITextFieldDelegate {
     
-    public static let ADDED_MSG :String = "Hooray! Your Jacket was successfully added. Start browsing it now."
-    public static let NOT_FOUND :String = "The Jacket Could not be found. Make sure the device is ON and charged."
+    public static let ADDED_MSG :String = "Hooray! Your device was successfully added. Start using it now."
+    public static let NOT_FOUND :String = "The device could not be found. Make sure it is ON and charged."
     
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var searchContainer: UIView!
@@ -40,7 +40,9 @@ class NewJacketViewController: UIViewController, UITextFieldDelegate {
         nameContainer.isHidden = true
         self.name_txt.delegate = self
         
-        self.loader_image.setGifImage(UIImage(gifName: "loader.gif"))
+        if let loaderGif = try? UIImage(gifName: "loader.gif") {
+            self.loader_image.setGifImage(loaderGif)
+        }
         self.loader_image.startAnimatingGif()
         
         self.handlerStart = Timer.scheduledTimer(withTimeInterval: self.timeToStartScan, repeats: false) { timer in

@@ -41,20 +41,20 @@ class TutorialPageViewController: UIPageViewController, UIPageViewControllerData
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        let viewControllerIndex = self.pages.index(of: viewController)
+        let viewControllerIndex = self.pages.firstIndex(of: viewController)
         let previousIndex = viewControllerIndex! - 1
         return (previousIndex == -1) ? nil : self.pages[previousIndex]
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        let viewControllerIndex = self.pages.index(of: viewController)
+        let viewControllerIndex = self.pages.firstIndex(of: viewController)
         let nextIndex = viewControllerIndex! + 1
         return (nextIndex == self.pages.count) ? nil : self.pages[nextIndex]
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         let pageContentViewController = pageViewController.viewControllers![0]
-        self.pageControl?.currentPage = self.pages.index(of: pageContentViewController)!
+        self.pageControl?.currentPage = self.pages.firstIndex(of: pageContentViewController)!
     }
 
 }

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftyGif
 
 class DisconnectedViewController: BaseViewController {
 
@@ -24,15 +25,17 @@ class DisconnectedViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loader_image.setGifImage(UIImage(gifName: "loader_black.gif"))
+        if let gif = try? UIImage(gifName: "loader_black.gif") {
+            loader_image.setGifImage(gif)
+        }
         self.loader_image.currentImage = UIImage(named: "loaded_bar")
         self.loader_image.tintColor = UIColor(hexString: "#23282E")
         
         self.jacket              = AppController.getCurrentJacket()
         self.bluetoothController = BluetoothController.getInstance()
 
-        connect_bt.accessibilityLabel = "Connect to jacket"
-        connect_bt.accessibilityHint = "Starts scanning for your Mercury jacket"
+        connect_bt.accessibilityLabel = "Connect to Mercury device"
+        connect_bt.accessibilityHint = "Starts scanning for your Mercury jacket or vest"
         status_txt.accessibilityTraits = .updatesFrequently
     }
     

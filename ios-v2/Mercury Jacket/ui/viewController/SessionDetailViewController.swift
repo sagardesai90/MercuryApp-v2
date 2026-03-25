@@ -287,7 +287,7 @@ class SessionDetailViewController: UIViewController {
             ("DURATION",    formatDuration(session.duration),                             StatsTheme.primaryText),
             ("AVG POWER",   String(format: "%.1f / 10", session.averagePower0to10),       StatsTheme.accentRed),
             ("TEMP DELTA",  deltaStr,                                                      StatsTheme.accentBlue),
-            ("AVG JACKET",  String(format: "%.1f%@", avgJacket, tempUnit),                StatsTheme.primaryText)
+            ("AVG GARMENT",  String(format: "%.1f%@", avgJacket, tempUnit),                StatsTheme.primaryText)
         ]
         items.forEach { statsRow.addArrangedSubview(makeStatCell(title: $0.0, value: $0.1, color: $0.2)) }
 
@@ -340,7 +340,7 @@ class SessionDetailViewController: UIViewController {
             chartView.yMax  = (allY.max() ?? 30) + 2
             chartView.yUnit = useFahrenheit ? "°F" : "°C"
             chartView.seriesData = [
-                LineChartView.Series(label: "Jacket",  color: StatsTheme.accentRed,  points: jacketYs),
+                LineChartView.Series(label: "Garment",  color: StatsTheme.accentRed,  points: jacketYs),
                 LineChartView.Series(label: "Outside", color: StatsTheme.accentBlue, points: ambientYs)
             ]
         } else {
@@ -376,7 +376,7 @@ class SessionDetailViewController: UIViewController {
             ? [("Power Output (W)", StatsTheme.accentRed), ("Set Level", UIColor(white: 0.4, alpha: 1))]
             : [("Heating Level (0–10)", StatsTheme.accentRed)]
         let items: [(String, UIColor)] = showTemperature
-            ? [("Jacket Temp", StatsTheme.accentRed), ("Outside Temp", StatsTheme.accentBlue)]
+            ? [("Garment", StatsTheme.accentRed), ("Outside", StatsTheme.accentBlue)]
             : heatingItems
 
         for (label, color) in items {
@@ -426,7 +426,7 @@ class SessionDetailViewController: UIViewController {
             ("Start time",        dateFmt.string(from: session.startDate)),
             ("End time",          session.endDate.map { dateFmt.string(from: $0) } ?? "Active"),
             ("Data points",       "\(session.dataPoints.count)"),
-            ("Avg jacket temp",   String(format: "%.1f%@", convertTemp(session.averageJacketTempCelsius), tempUnit)),
+            ("Avg garment temp",   String(format: "%.1f%@", convertTemp(session.averageJacketTempCelsius), tempUnit)),
             ("Avg ambient temp",  String(format: "%.1f%@", convertTemp(session.averageAmbientTempCelsius), tempUnit)),
             ("Est. energy used",  String(format: "~%.1f Wh", session.estimatedEnergyWh))
         ]

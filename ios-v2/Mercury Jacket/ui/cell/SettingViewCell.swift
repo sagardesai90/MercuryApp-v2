@@ -153,7 +153,7 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
 
                 let alert = Alert(context: AppController.getContext())
                 alert.confirmMessage = "Continue"
-                alert.create(message: String(format: "The Jacket \"%@\" was disconnected.", self.jacket!.name), type: Alert.CONFIRM)
+                alert.create(message: String(format: "\"%@\" was disconnected.", self.jacket!.name), type: Alert.CONFIRM)
                 alert.show()
             }
         }))
@@ -188,7 +188,7 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
 
                     let confirmation = Alert(context: AppController.getContext())
                     confirmation.confirmMessage = "Continue"
-                    confirmation.create(message: String(format: "The Jacket \"%@\" was deleted.", self.jacket!.name), type: Alert.CONFIRM)
+                    confirmation.create(message: String(format: "\"%@\" was deleted.", self.jacket!.name), type: Alert.CONFIRM)
                     confirmation.setActionListener(listener: Alert.ActionListener(onActionClick: { _ in
                         if !AppController.hasJackets() {
                             AppController.startViewController(viewController: AppController.instantiate(id: String(describing: TutorialViewController.self)), clearStack: true)

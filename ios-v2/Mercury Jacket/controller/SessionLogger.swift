@@ -38,7 +38,7 @@ class SessionLogger {
 
     private func beginSession() {
         closeSession()
-        let name = AppController.getCurrentJacket()?.name ?? "Mercury Jacket"
+        let name = AppController.getCurrentJacket()?.name ?? "Mercury App"
         currentSession = Session(
             id: UUID().uuidString,
             jacketName: name,

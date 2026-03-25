@@ -733,7 +733,7 @@ to App</string>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WSc-Nb-ssp">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
-                                <color key="backgroundColor" red="0.13796454668045044" green="0.15653395652770996" blue="0.182599276304245" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SMF-BG-ZpT" userLabel="ActionBar">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="60"/>
@@ -790,7 +790,7 @@ to App</string>
                                         <rect key="frame" x="285" y="17.5" width="25" height="25"/>
                                     </imageView>
                                 </subviews>
-                                <color key="backgroundColor" red="0.13725490196078433" green="0.15686274509803921" blue="0.1803921568627451" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="HaL-ak-HoY" firstAttribute="top" secondItem="SMF-BG-ZpT" secondAttribute="top" id="3CM-dc-d0c"/>
                                     <constraint firstItem="ZM6-L6-V3Z" firstAttribute="leading" secondItem="FT6-b2-P57" secondAttribute="trailing" constant="15" id="3QW-Op-Of7"/>
@@ -984,7 +984,7 @@ to App</string>
                                     <constraint firstAttribute="height" constant="20" id="yMb-Id-PX2"/>
                                 </constraints>
                             </imageView>
-                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Press &amp; Hold the Button on the Mercury Jacket to Start" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZfP-0x-Wqu">
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Press &amp; Hold the Button on your Mercury garment to Start" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZfP-0x-Wqu">
                                 <rect key="frame" x="60.5" y="439" width="254" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="2J8-GR-dgh"/>
@@ -1600,7 +1600,7 @@ to App</string>
                                                         <constraint firstAttribute="height" constant="32" id="w35-Dj-Xvp"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" name="FoundersGrotesk-Regular" family="Founders Grotesk" pointSize="20"/>
-                                                    <state key="normal" title="+ Add a new jacket">
+                                                    <state key="normal" title="+ Add a new device">
                                                         <color key="titleColor" red="0.62745098039215685" green="0.74901960784313726" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                     </state>
                                                     <connections>
@@ -1805,7 +1805,7 @@ to App</string>
                                                     <action selector="close_handle:" destination="iGa-w1-owh" eventType="touchUpInside" id="5PO-tw-s1V"/>
                                                 </connections>
                                             </button>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add a new jacket" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ubb-0e-j9g">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add a new device" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ubb-0e-j9g">
                                                 <rect key="frame" x="20" y="23" width="296" height="20"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="296" id="JHw-uH-6Zv"/>
@@ -1849,7 +1849,7 @@ to App</string>
                                                     <constraint firstAttribute="width" secondItem="ee5-XU-SBl" secondAttribute="height" multiplier="9:14" id="jCM-iF-FFW"/>
                                                 </constraints>
                                             </imageView>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Looking for a new jacket…" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aJQ-nY-8Rn">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Looking for a new device…" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aJQ-nY-8Rn">
                                                 <rect key="frame" x="25" y="392.5" width="325" height="34"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="34" id="FAE-1c-OUZ"/>
@@ -1858,7 +1858,7 @@ to App</string>
                                                 <color key="textColor" red="0.66666666666666663" green="0.71764705882352942" blue="0.74117647058823533" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Thermal Jacket uses Bluetooth for connectivity" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2ev-tt-FD3">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mercury App uses Bluetooth for connectivity" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2ev-tt-FD3">
                                                 <rect key="frame" x="80.5" y="446.5" width="214" height="46"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="214" id="3yK-3I-pHt"/>
@@ -1886,7 +1886,7 @@ to App</string>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="44z-fp-nxP" userLabel="NameContainer">
                                         <rect key="frame" x="0.0" y="60" width="375" height="592"/>
                                         <subviews>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name your jacket…" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="qiE-W3-5aO">
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name your device…" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="qiE-W3-5aO">
                                                 <rect key="frame" x="25" y="0.0" width="325" height="207"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="FoundersGrotesk-Regular" family="Founders Grotesk" pointSize="20"/>
@@ -2027,7 +2027,7 @@ Optimal Heat at the right time </string>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="about_smart_bar" translatesAutoresizingMaskIntoConstraints="NO" id="bWI-Ep-hMR">
                                                 <rect key="frame" x="19" y="126" width="337" height="355"/>
                                             </imageView>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="As you change heat in “Smart Mode”, the jacket learns for future reference." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8tW-f6-G1y">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="As you change heat in “Smart Mode”, Mercury learns for future reference." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8tW-f6-G1y">
                                                 <rect key="frame" x="25" y="501" width="325" height="59"/>
                                                 <fontDescription key="fontDescription" name="FoundersGrotesk-Regular" family="Founders Grotesk" pointSize="14"/>
                                                 <color key="textColor" red="0.66666666666666663" green="0.71764705882352942" blue="0.74117647058823533" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
