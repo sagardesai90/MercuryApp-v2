@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
-            android:text="As you change heat in “Smart Mode”, the\njacket learns for future reference."
+            android:text="As you change heat in “Smart Mode”, Mercury\nlearns for future reference."
             android:textAlignment="center"
             android:textColor="@color/greyThree"
             android:textSize="14sp"

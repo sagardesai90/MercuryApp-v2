@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_weight="70"
-        android:text="Automatically turn Jacket on when motion is detected"
+        android:text="Automatically turn your Mercury garment on when motion is detected"
         android:textColor="@color/greyThree"
         android:textSize="19sp"
         app:fontFamily="@string/regular_font" />

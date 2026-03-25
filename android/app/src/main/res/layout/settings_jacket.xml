@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:text="Jacket Name"
+            android:text="Device name"
             android:textColor="@color/white"
             android:textSize="@dimen/titleSize"
             app:fontFamily="@string/regular_font"/>

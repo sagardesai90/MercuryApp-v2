@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="5dp"
         android:gravity="center_vertical"
-        android:text="Mercury Jacket"
+        android:text="Mercury App"
         android:textColor="@color/white"
         android:textSize="@dimen/titleSize"
         app:fontFamily="@string/regular_font" />

@@ -57,7 +57,7 @@ import quarky.com.br.mercuryjacket.util.ValueInterpreter;
 
 public class BluetoothController{
     private final String TAG                 = "BluetoothController";
-    private final String DEFAULT_DEVICE_NAME = "Mercury Jacket";
+    private final String DEFAULT_DEVICE_NAME = "Mercury App";
     private final int SCAN_TIME              = 12;
     private final int READ_TIME              = 3;
     private final String ALEXA_URL           = "https://x0i55e3ypk.execute-api.us-east-1.amazonaws.com/prod/?email=%s";
