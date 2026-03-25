@@ -40,6 +40,7 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
         for jacket in jackets{
             data.append(jacket)
         }
+        data.append("temperatureUnit")
         data.append("new")
         self.tableView.reloadData()
     }
@@ -60,6 +61,24 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let element = self.data[indexPath.row]
         var cell :UITableViewCell! = nil
+        if let str = element as? String, str == "temperatureUnit" {
+            let tCell = tableView.dequeueReusableCell(withIdentifier: "temperatureUnit")
+                ?? UITableViewCell(style: .subtitle, reuseIdentifier: "temperatureUnit")
+            tCell.textLabel?.text = "Temperature units"
+            tCell.detailTextLabel?.text = "Dashboard, stats & Live Activity"
+            tCell.detailTextLabel?.textColor = .secondaryLabel
+            tCell.selectionStyle = .none
+            let seg: UISegmentedControl
+            if let existing = tCell.accessoryView as? UISegmentedControl {
+                seg = existing
+            } else {
+                seg = UISegmentedControl(items: ["°C", "°F"])
+                seg.addTarget(self, action: #selector(temperatureUnitChanged(_:)), for: .valueChanged)
+                tCell.accessoryView = seg
+            }
+            seg.selectedSegmentIndex = AppController.getTemperatureMeasure() == AppController.FAHRENHEIT ? 1 : 0
+            return tCell
+        }
         if(element is String)
         {
             cell = self.tableView.dequeueReusableCell(withIdentifier: "new")
@@ -89,8 +108,10 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
         {
             return
         }
-        
-        let settingCell :SettingViewCell = cell as! SettingViewCell
+        guard let settingCell = cell as? SettingViewCell else {
+            tableView.deselectRow(at: indexPath, animated: false)
+            return
+        }
         // Inner table + action buttons (connect / disconnect / delete / rename)
         self.cellHeight = Float(settingCell.tableHeight.constant + 280)
         
@@ -108,6 +129,9 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row < data.count, data[indexPath.row] as? String == "temperatureUnit" {
+            return 72.0
+        }
         let cell = tableView.cellForRow(at: indexPath)
         
         let smallHeight: CGFloat = 60.0
@@ -162,6 +186,13 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
         intro.hasBack = true
         AppController.startViewController(viewController: intro)
     }
-    
-    
+
+    @objc private func temperatureUnitChanged(_ sender: UISegmentedControl) {
+        let useFahrenheit = sender.selectedSegmentIndex == 1
+        AppController.setTemperatureMeasure(value: useFahrenheit ? AppController.FAHRENHEIT : AppController.CELSIUS)
+        NotificationCenter.default.post(name: .mercuryTemperatureUnitDidChange, object: nil)
+        if #available(iOS 16.2, *) {
+            Task { await HeatLiveActivityManager.shared.refreshFromBluetoothState() }
+        }
+    }
 }

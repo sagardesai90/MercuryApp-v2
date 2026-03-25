@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreBluetooth
+import SwiftyGif
 
 class RunningViewController: BaseViewController {
 
@@ -229,9 +230,17 @@ class RunningViewController: BaseViewController {
                 self.setMode(value: intValue);
                 
                 break;
+            case JacketGattAttributes.EXTERNAL_TEMPERATURE.uuidString,
+                 JacketGattAttributes.BATTERY_LEVEL.uuidString:
+                self.syncLiveActivityFromBluetooth()
+                break
             default:
                 break
             }
+        }
+
+        self.bluetoothController.listenTo(id: TAG, eventName: BluetoothController.Events.ON_DEVICE_DISCONNECTED) { [weak self] _ in
+            self?.liveActivityEndIfNeeded()
         }
         
         self.bluetoothController.readCharacteristic(uuid: JacketGattAttributes.MODE)
@@ -239,6 +248,9 @@ class RunningViewController: BaseViewController {
         
         self.setMode(value: bluetoothController.getValue(uuid: JacketGattAttributes.MODE));
         self.setPowerLevel(value: bluetoothController.getValue(uuid: JacketGattAttributes.POWER_LEVEL))
+
+        self.liveActivityStartIfNeeded()
+        self.syncLiveActivityFromBluetooth()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -249,6 +261,7 @@ class RunningViewController: BaseViewController {
         }
         self.stopLearning(stopAnimation: true)
         self.bluetoothController.removeListeners(id: TAG, eventNameToRemoveOrNil: nil)
+        self.liveActivityEndIfNeeded()
     }
     
     @objc func preloaderTapped(tapGestureRecognizer: UITapGestureRecognizer)
@@ -529,6 +542,7 @@ class RunningViewController: BaseViewController {
     {
         let level :Float = Float(round(Double(value) / 1000.0));
         self.updateLevel(level: level, animate: true)
+        self.syncLiveActivityFromBluetooth()
     }
     
     private func setMode(value :Int)
@@ -554,6 +568,7 @@ class RunningViewController: BaseViewController {
             smartMode(update: false);
             break;
         }
+        self.syncLiveActivityFromBluetooth()
     }
     
     public func manualMode(update :Bool)
@@ -565,7 +580,9 @@ class RunningViewController: BaseViewController {
         info_bt.isHidden = true
         
         bar_image.tintColor = UIColor(hexString: "#E05656")
-        preloader_image.setGifImage(UIImage(gifName: "circle_loader_red"))
+        if let gif = try? UIImage(gifName: "circle_loader_red") {
+            preloader_image.setGifImage(gif)
+        }
         preloader_image.loopCount = 0
         preloader_image.stopAnimatingGif()
         
@@ -583,6 +600,7 @@ class RunningViewController: BaseViewController {
             bluetoothController.writeCharacteristic(uuid: JacketGattAttributes.MODE,value: JacketGattAttributes.MANUAL_MODE);
             self.updateDebugWrite(text: "\(JacketGattAttributes.getName(uuid: JacketGattAttributes.MODE)) = \(JacketGattAttributes.MANUAL_MODE)")
         }
+        self.syncLiveActivityFromBluetooth()
     }
     
     public func smartMode(update :Bool)
@@ -593,7 +611,9 @@ class RunningViewController: BaseViewController {
         info_bt.isHidden = false
         
         bar_image.tintColor = UIColor(hexString: "#00B200")
-        preloader_image.setGifImage(UIImage(gifName: "circle_loader_green"))
+        if let gif = try? UIImage(gifName: "circle_loader_green") {
+            preloader_image.setGifImage(gif)
+        }
         preloader_image.stopAnimatingGif()
         
         manual_bt.setImage(UIImage(named: "manual_bt_inactive"), for: UIControl.State.normal)
@@ -611,6 +631,35 @@ class RunningViewController: BaseViewController {
             self.updateDebugWrite(text: "\(JacketGattAttributes.getName(uuid: JacketGattAttributes.MODE)) = \(JacketGattAttributes.SMART_MODE)")
         }else{
             self.calculateSmartPower();
+        }
+        self.syncLiveActivityFromBluetooth()
+    }
+
+    // MARK: - Live Activity (iOS 16.2+)
+
+    private func liveActivityStartIfNeeded() {
+        guard #available(iOS 16.2, *) else { return }
+        let name = AppController.getCurrentJacket()?.dashboardTitleText() ?? "Mercury App"
+        Task {
+            await HeatLiveActivityManager.shared.start(jacketName: name)
+            await self.syncLiveActivityAsync()
+        }
+    }
+
+    private func syncLiveActivityFromBluetooth() {
+        guard #available(iOS 16.2, *) else { return }
+        Task { await self.syncLiveActivityAsync() }
+    }
+
+    @available(iOS 16.2, *)
+    private func syncLiveActivityAsync() async {
+        await HeatLiveActivityManager.shared.updateFromBluetoothState()
+    }
+
+    private func liveActivityEndIfNeeded() {
+        guard #available(iOS 16.2, *) else { return }
+        Task {
+            await HeatLiveActivityManager.shared.end()
         }
     }
 }

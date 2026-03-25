@@ -14,6 +14,8 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Mercury App</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -26,10 +28,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>ministryofsupply.MercuryJacket</string>
+			<string>com.sagardesai.mercuryjacket</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>amzn-ministryofsupply.MercuryJacket</string>
+				<string>amzn-com.sagardesai.mercuryjacket</string>
 			</array>
 		</dict>
 	</array>
@@ -37,10 +39,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Connection with jacket</string>
+	<string>Connect to your Mercury heated jacket or vest</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Connection with jacket</string>
+	<string>Connect to your Mercury heated jacket or vest</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Get the local temperature</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

@@ -42,6 +42,30 @@ class DashBoardViewController: BaseViewController, CLLocationManagerDelegate {
             stats_button?.tintColor = .white
         }
 
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refreshTemperatureForUnitChange),
+            name: .mercuryTemperatureUnitDidChange,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    /// Keeps the dashboard number in sync when °C / °F is changed from Settings.
+    @objc private func refreshTemperatureForUnitChange() {
+        guard jacket != nil else { return }
+        if jacket.getSetting(key: Jacket.LOCATION_REQUEST),
+           let lm = locationManager {
+            let status = lm.authorizationStatus
+            if status == .authorizedWhenInUse || status == .authorizedAlways {
+                getLocation()
+                return
+            }
+        }
+        getLocalTemperature()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -164,6 +188,9 @@ class DashBoardViewController: BaseViewController, CLLocationManagerDelegate {
             }
 
             setTemperature(value: Float(newTemp))
+            if #available(iOS 16.2, *) {
+                Task { await HeatLiveActivityManager.shared.refreshFromBluetoothState() }
+            }
         }
     }
 
@@ -172,8 +199,8 @@ class DashBoardViewController: BaseViewController, CLLocationManagerDelegate {
     }
 
     func getLocation() {
-        if CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
-            CLLocationManager.authorizationStatus() == .authorizedAlways {
+        let status = locationManager.authorizationStatus
+        if status == .authorizedWhenInUse || status == .authorizedAlways {
             guard let currentLocation = locationManager.location else { return }
             localTemperature = false
 

@@ -45,7 +45,9 @@ final class AppEnvironment {
     var temperatureMeasure: Int {
         get {
             if cachedMeasure < 0 {
-                cachedMeasure = UserDefaults.standard.integer(forKey: AppEnvironment.measureKey)
+                let stored = UserDefaults.standard.integer(forKey: AppEnvironment.measureKey)
+                // `integer(forKey:)` returns 0 when unset; treat as Celsius.
+                cachedMeasure = stored == 0 ? AppEnvironment.CELSIUS : stored
             }
             return cachedMeasure
         }
@@ -139,4 +141,9 @@ final class AppEnvironment {
     static func settingName(for key: Int) -> String {
         settingsNames[key] ?? ""
     }
+}
+
+extension Notification.Name {
+    /// Posted when the user changes °C / °F so Live Activity and other UI can refresh.
+    static let mercuryTemperatureUnitDidChange = Notification.Name("mercuryTemperatureUnitDidChange")
 }

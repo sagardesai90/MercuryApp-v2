@@ -10,14 +10,6 @@
 		009C896C4B9F42DD2C72CEBF /* Pods_Mercury_Jacket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7D21E02BD20052AA19 /* Pods_Mercury_Jacket.framework */; };
 		128121AF21EFAF990020E8E7 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 128121AE21EFAF990020E8E7 /* SafariServices.framework */; };
 		12B2DEC82368D6AF0091FFA7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B2DEC72368D6AF0091FFA7 /* Security.framework */; };
-		12BBFE6E21E02BC70052AA19 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE6D21E02BC70052AA19 /* Alamofire.framework */; };
-		12BBFE7021E02BC70052AA19 /* DottedLineView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE6F21E02BC70052AA19 /* DottedLineView.framework */; };
-		12BBFE7221E02BC70052AA19 /* FirebaseCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7121E02BC70052AA19 /* FirebaseCore.framework */; };
-		12BBFE7421E02BC70052AA19 /* GoogleUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7321E02BC70052AA19 /* GoogleUtilities.framework */; };
-		12BBFE7621E02BC70052AA19 /* IQKeyboardManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7521E02BC70052AA19 /* IQKeyboardManager.framework */; };
-		12BBFE7821E02BC70052AA19 /* nanopb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7721E02BC70052AA19 /* nanopb.framework */; };
-		12BBFE7A21E02BC70052AA19 /* SwiftyGif.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7921E02BC70052AA19 /* SwiftyGif.framework */; };
-		12BBFE7C21E02BC70052AA19 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12BBFE7B21E02BC70052AA19 /* SwiftyJSON.framework */; };
 		12E3373321CA8432004C2B8B /* JacketGattAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E3373221CA8432004C2B8B /* JacketGattAttributes.swift */; };
 		5310145321BAAF3B00C0883E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5310145221BAAF3B00C0883E /* AppDelegate.swift */; };
 		5310145821BAAF3B00C0883E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5310145621BAAF3B00C0883E /* Main.storyboard */; };
@@ -58,6 +50,12 @@
 		53D63D6E21BF6EB200D6452D /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D63D6D21BF6EB200D6452D /* Alert.swift */; };
 		53D63D7121BF732C00D6452D /* MainNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D63D7021BF732C00D6452D /* MainNavigationController.swift */; };
 		53D63D7321BF74E300D6452D /* TutorialPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D63D7221BF74E300D6452D /* TutorialPageViewController.swift */; };
+		A1E100000000000000000001 /* MercuryHeatActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E100000000000000000010 /* MercuryHeatActivityAttributes.swift */; };
+		A1E100000000000000000002 /* HeatLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E100000000000000000011 /* HeatLiveActivityManager.swift */; };
+		A1E100000000000000000003 /* MercuryHeatActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E100000000000000000010 /* MercuryHeatActivityAttributes.swift */; };
+		A1E100000000000000000004 /* MercuryHeatWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E100000000000000000012 /* MercuryHeatWidgetBundle.swift */; };
+		A1E100000000000000000005 /* MercuryHeatLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E100000000000000000013 /* MercuryHeatLiveActivity.swift */; };
+		A1E100000000000000000006 /* MercuryHeatWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A1E100000000000000000020 /* MercuryHeatWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AA00000100000001 /* SessionDataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000001 /* SessionDataPoint.swift */; };
 		AA00000100000002 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000002 /* Session.swift */; };
 		AA00000100000003 /* SessionLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000200000003 /* SessionLogger.swift */; };
@@ -72,6 +70,30 @@
 		AA0000010000000C /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000C /* LineChartView.swift */; };
 		AA0000010000000D /* StatsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000D /* StatsTheme.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A1E100000000000000000051 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5310144721BAAF3B00C0883E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1E100000000000000000043;
+			remoteInfo = MercuryHeatWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A1E100000000000000000031 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A1E100000000000000000006 /* MercuryHeatWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		12224B6621E026F600D1C40B /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -140,6 +162,12 @@
 		53D63D7221BF74E300D6452D /* TutorialPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPageViewController.swift; sourceTree = "<group>"; };
 		767A534E5D3E3F67F945AA49 /* Pods-Mercury Jacket.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mercury Jacket.release.xcconfig"; path = "Pods/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket.release.xcconfig"; sourceTree = "<group>"; };
 		95F63BE71D7166830AC25964 /* Pods_Mercury_Jacket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Mercury_Jacket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1E100000000000000000010 /* MercuryHeatActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MercuryHeatActivityAttributes.swift; sourceTree = "<group>"; };
+		A1E100000000000000000011 /* HeatLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatLiveActivityManager.swift; sourceTree = "<group>"; };
+		A1E100000000000000000012 /* MercuryHeatWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MercuryHeatWidgetBundle.swift; sourceTree = "<group>"; };
+		A1E100000000000000000013 /* MercuryHeatLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MercuryHeatLiveActivity.swift; sourceTree = "<group>"; };
+		A1E100000000000000000014 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1E100000000000000000020 /* MercuryHeatWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MercuryHeatWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA00000200000001 /* SessionDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDataPoint.swift; sourceTree = "<group>"; };
 		AA00000200000002 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		AA00000200000003 /* SessionLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionLogger.swift; sourceTree = "<group>"; };
@@ -162,16 +190,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				128121AF21EFAF990020E8E7 /* SafariServices.framework in Frameworks */,
-				12BBFE6E21E02BC70052AA19 /* Alamofire.framework in Frameworks */,
-				12BBFE7021E02BC70052AA19 /* DottedLineView.framework in Frameworks */,
-				12BBFE7221E02BC70052AA19 /* FirebaseCore.framework in Frameworks */,
-				12BBFE7421E02BC70052AA19 /* GoogleUtilities.framework in Frameworks */,
-				12BBFE7621E02BC70052AA19 /* IQKeyboardManager.framework in Frameworks */,
-				12BBFE7821E02BC70052AA19 /* nanopb.framework in Frameworks */,
-				12BBFE7A21E02BC70052AA19 /* SwiftyGif.framework in Frameworks */,
 				12B2DEC82368D6AF0091FFA7 /* Security.framework in Frameworks */,
-				12BBFE7C21E02BC70052AA19 /* SwiftyJSON.framework in Frameworks */,
 				009C896C4B9F42DD2C72CEBF /* Pods_Mercury_Jacket.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1E100000000000000000030 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				5310145121BAAF3B00C0883E /* Mercury Jacket */,
+				A1E100000000000000000040 /* MercuryHeatWidget */,
 				5310145021BAAF3B00C0883E /* Products */,
 				EBDE43856E64188E5DC4F3F9 /* Pods */,
 				3C2F4B68719ECFB883D935E9 /* Frameworks */,
@@ -222,6 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				5310144F21BAAF3B00C0883E /* Mercury Jacket.app */,
+				A1E100000000000000000020 /* MercuryHeatWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -283,6 +312,7 @@
 				53D63D5021BF56D800D6452D /* BluetoothController.swift */,
 				53D63D5121BF56D800D6452D /* AppController.swift */,
 				12E3373221CA8432004C2B8B /* JacketGattAttributes.swift */,
+				A1E100000000000000000011 /* HeatLiveActivityManager.swift */,
 				AA00000200000003 /* SessionLogger.swift */,
 				AA00000200000005 /* AppEnvironment.swift */,
 				AA00000200000006 /* SessionStore.swift */,
@@ -383,6 +413,17 @@
 			path = view;
 			sourceTree = "<group>";
 		};
+		A1E100000000000000000040 /* MercuryHeatWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A1E100000000000000000010 /* MercuryHeatActivityAttributes.swift */,
+				A1E100000000000000000012 /* MercuryHeatWidgetBundle.swift */,
+				A1E100000000000000000013 /* MercuryHeatLiveActivity.swift */,
+				A1E100000000000000000014 /* Info.plist */,
+			);
+			path = MercuryHeatWidget;
+			sourceTree = "<group>";
+		};
 		EBDE43856E64188E5DC4F3F9 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -403,16 +444,35 @@
 				5310144B21BAAF3B00C0883E /* Sources */,
 				5310144C21BAAF3B00C0883E /* Frameworks */,
 				5310144D21BAAF3B00C0883E /* Resources */,
-				45CB1B554F8ACC1B213D38F6 /* [CP] Embed Pods Frameworks */,
+				A1E100000000000000000031 /* Embed Foundation Extensions */,
+				1960F72DC3C523AB18837D27 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A1E100000000000000000050 /* PBXTargetDependency */,
 			);
 			name = "Mercury Jacket";
 			productName = "Mercury Jacket";
 			productReference = 5310144F21BAAF3B00C0883E /* Mercury Jacket.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A1E100000000000000000043 /* MercuryHeatWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1E100000000000000000046 /* Build configuration list for PBXNativeTarget "MercuryHeatWidgetExtension" */;
+			buildPhases = (
+				A1E100000000000000000041 /* Sources */,
+				A1E100000000000000000030 /* Frameworks */,
+				A1E100000000000000000042 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MercuryHeatWidgetExtension;
+			productName = MercuryHeatWidgetExtension;
+			productReference = A1E100000000000000000020 /* MercuryHeatWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -433,6 +493,10 @@
 							};
 						};
 					};
+					A1E100000000000000000043 = {
+						CreatedOnToolsVersion = 15.0;
+						DevelopmentTeam = 6H32287PP9;
+					};
 				};
 			};
 			buildConfigurationList = 5310144A21BAAF3B00C0883E /* Build configuration list for PBXProject "Mercury Jacket" */;
@@ -449,6 +513,7 @@
 			projectRoot = "";
 			targets = (
 				5310144E21BAAF3B00C0883E /* Mercury Jacket */,
+				A1E100000000000000000043 /* MercuryHeatWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -470,28 +535,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1E100000000000000000042 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		45CB1B554F8ACC1B213D38F6 /* [CP] Embed Pods Frameworks */ = {
+		1960F72DC3C523AB18837D27 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Mercury Jacket/Pods-Mercury Jacket-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4CBA9659EE8D9D13276FDEA0 /* [CP] Check Pods Manifest.lock */ = {
@@ -563,10 +631,30 @@
 				AA0000010000000B /* SessionDetailViewController.swift in Sources */,
 				AA0000010000000C /* LineChartView.swift in Sources */,
 				AA0000010000000D /* StatsTheme.swift in Sources */,
+				A1E100000000000000000001 /* MercuryHeatActivityAttributes.swift in Sources */,
+				A1E100000000000000000002 /* HeatLiveActivityManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1E100000000000000000041 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1E100000000000000000003 /* MercuryHeatActivityAttributes.swift in Sources */,
+				A1E100000000000000000004 /* MercuryHeatWidgetBundle.swift in Sources */,
+				A1E100000000000000000005 /* MercuryHeatLiveActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A1E100000000000000000050 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A1E100000000000000000043 /* MercuryHeatWidgetExtension */;
+			targetProxy = A1E100000000000000000051 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		5310145621BAAF3B00C0883E /* Main.storyboard */ = {
@@ -644,7 +732,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -705,7 +793,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -730,16 +818,16 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = "Mercury Jacket/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.3.4;
-				PRODUCT_BUNDLE_IDENTIFIER = ministryofsupply.MercuryJacket;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sagardesai.mercuryjacket;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -758,16 +846,66 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = "Mercury Jacket/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.3.4;
-				PRODUCT_BUNDLE_IDENTIFIER = ministryofsupply.MercuryJacket;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sagardesai.mercuryjacket;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A1E100000000000000000053 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = 6H32287PP9;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MercuryHeatWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.3.4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sagardesai.mercuryjacket.MercuryHeatWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A1E100000000000000000054 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = 6H32287PP9;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MercuryHeatWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.3.4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sagardesai.mercuryjacket.MercuryHeatWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -789,6 +927,15 @@
 			buildConfigurations = (
 				5310146221BAAF5400C0883E /* Debug */,
 				5310146321BAAF5400C0883E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1E100000000000000000046 /* Build configuration list for PBXNativeTarget "MercuryHeatWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1E100000000000000000053 /* Debug */,
+				A1E100000000000000000054 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
