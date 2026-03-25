@@ -11,6 +11,15 @@ final class JacketTests: XCTestCase {
         let decoded = try JSONDecoder().decode(Jacket.self, from: data)
         XCTAssertEqual(decoded.id, "ABC-123")
         XCTAssertEqual(decoded.name, "Test Jacket")
+        XCTAssertNil(decoded.advertisedDeviceName)
+    }
+
+    func testEncodeDecodePreservesAdvertisedName() throws {
+        let jacket = Jacket(id: "id-1", name: "Mine", advertisedDeviceName: "Mercury Vest")
+        let data = try JSONEncoder().encode(jacket)
+        let decoded = try JSONDecoder().decode(Jacket.self, from: data)
+        XCTAssertEqual(decoded.advertisedDeviceName, "Mercury Vest")
+        XCTAssertEqual(decoded.dashboardTitleText(), "Mine · Vest")
     }
 
     func testEncodeDecodePreservesSettings() throws {

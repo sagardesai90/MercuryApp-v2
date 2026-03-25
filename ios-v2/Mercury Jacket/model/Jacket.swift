@@ -28,10 +28,30 @@ class Jacket :Codable {
     
     var id   :String
     var name :String
-    
-    init(id :String, name :String){
-        self.id = id;
-        self.name = name;
+
+    /// BLE `CBPeripheral.name` captured when the device was added (used to show Vest vs Jacket). Updated on connect if missing.
+    var advertisedDeviceName: String?
+
+    init(id: String, name: String, advertisedDeviceName: String? = nil) {
+        self.id = id
+        self.name = name
+        self.advertisedDeviceName = advertisedDeviceName
+    }
+
+    /// Short product label for UI, e.g. "Vest" / "Jacket", from the advertised name at pairing.
+    func productKindShortLabel() -> String? {
+        guard let raw = advertisedDeviceName?.lowercased() else { return nil }
+        if raw.contains("vest") { return "Vest" }
+        if raw.contains("jacket") { return "Jacket" }
+        return nil
+    }
+
+    /// Primary line for dashboard / settings: `"MyName · Vest"` when product kind is known.
+    func dashboardTitleText() -> String {
+        if let kind = productKindShortLabel() {
+            return "\(name) · \(kind)"
+        }
+        return name
     }
     
     public func getSetting(key :Int) ->Bool

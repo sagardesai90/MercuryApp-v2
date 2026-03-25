@@ -58,6 +58,10 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
     private var scanning: Bool = false
     private var scanningForNew: Bool = false
 
+    /// Extra 20s windows after the first timeout while other registered jackets are still pending (multi-device).
+    private var scanWindowExtensionCount: Int = 0
+    private let maxScanWindowExtensions: Int = 5
+
     private var scanTimer: Timer?
     private var adapterAlert: Alert!
 
@@ -205,6 +209,13 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
 
         eventsManager.trigger(eventName: Events.ON_DEVICE_CONNECTED, information: deviceID)
         deviceConnectedPublisher.send(deviceID)
+        if let pname = peripheral.name {
+            for j in AppController.getJacketsList() where j.id == deviceID && j.advertisedDeviceName == nil {
+                j.advertisedDeviceName = pname
+                j.save()
+                break
+            }
+        }
         peripheral.discoverServices([JacketGattAttributes.serviceCBUUID])
 
         if pendingConnectionIDs.isEmpty && !scanningForNew && scanning {
@@ -279,6 +290,10 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
 
         if duration < 5.0 {
             print("Quick disconnect — silent retry for \(deviceID.prefix(8))")
+            // Still notify UI so the dashboard shows the disconnected state and starts reconnect flow (vest firmware often drops quickly).
+            eventsManager.trigger(eventName: Events.ON_DEVICE_DISCONNECTED,
+                                  information: [deviceID, true] as [AnyObject])
+            deviceDisconnectedPublisher.send((deviceID: deviceID, tryReconnect: true))
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 guard self.adapterIsEnabled else { return }
                 self.connectAllRegistered()
@@ -346,6 +361,19 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         servicesDiscoveredPublisher.send(deviceID)
         startReadTimer(deviceID: deviceID)
         readCharacteristics(deviceID: deviceID)
+        scheduleModeReadRetries(deviceID: deviceID)
+    }
+
+    /// Some firmware (e.g. vest builds) does not return a usable MODE on the first read after reconnect; stagger extra reads.
+    private func scheduleModeReadRetries(deviceID: String) {
+        let delays: [TimeInterval] = [0.35, 0.9, 2.0, 4.0]
+        for delay in delays {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self = self else { return }
+                guard self.connectedDeviceIDs.contains(deviceID) else { return }
+                self.readCharacteristic(uuid: JacketGattAttributes.MODE, deviceID: deviceID)
+            }
+        }
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -595,6 +623,7 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         cancellingForReconnect.removeAll()
         manager?.stopScan()
         stopScanTimer()
+        scanWindowExtensionCount = 0
     }
 
     public func stopConnection() {
@@ -646,8 +675,11 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
 
     // MARK: - Scan Timer
 
-    private func startScanTimer() {
+    private func startScanTimer(extendSession: Bool = false) {
         stopScanTimer()
+        if !extendSession {
+            scanWindowExtensionCount = 0
+        }
         scanTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(SCAN_TIME),
                                         repeats: false) { [weak self] _ in
             self?.scanTimeout()
@@ -659,10 +691,39 @@ class BluetoothController: NSObject, CBCentralManagerDelegate, CBPeripheralDeleg
         scanTimer = nil
     }
 
+    private func savedJacketIDs() -> Set<String> {
+        guard let dict = UserDefaults.standard.dictionary(forKey: AppController.KEY_JACKETS) as? [String: String] else {
+            return Set()
+        }
+        return Set(dict.keys)
+    }
+
+    /// Pending IDs that are still saved in the app and not yet connected (multi-jacket scan).
+    private func pendingRegisteredDeviceIDs() -> Set<String> {
+        let saved = savedJacketIDs()
+        return Set(pendingConnectionIDs.filter { saved.contains($0) && !connectedDeviceIDs.contains($0) })
+    }
+
     private func scanTimeout() {
         print("Scan timeout")
         let wasNewScan = scanningForNew
         let currentID = AppController.getCurrentJacket()?.id
+
+        let stillPending = pendingRegisteredDeviceIDs()
+        if !wasNewScan && !stillPending.isEmpty {
+            scanWindowExtensionCount += 1
+            if scanWindowExtensionCount <= maxScanWindowExtensions {
+                print("Scan timeout — \(stillPending.count) jacket(s) still pending, extending window \(scanWindowExtensionCount)/\(maxScanWindowExtensions)")
+                if !scanning && !scanningForNew {
+                    scanning = true
+                    manager.delegate = self
+                    manager.scanForPeripherals(withServices: nil, options: nil)
+                }
+                startScanTimer(extendSession: true)
+                return
+            }
+        }
+
         stopScan()
         if wasNewScan || (currentID != nil && !connectedDeviceIDs.contains(currentID!)) {
             eventsManager.trigger(eventName: Events.ON_SCAN_NOT_FOUND)

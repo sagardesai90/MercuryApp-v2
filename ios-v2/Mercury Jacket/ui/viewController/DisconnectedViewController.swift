@@ -80,9 +80,9 @@ class DisconnectedViewController: BaseViewController {
         {
             searching = true;
             
-            status_txt.text = String(format: "Connecting to %@…", self.jacket.name)
+            status_txt.text = String(format: "Connecting to %@…", self.jacket.dashboardTitleText())
             status_txt.textColor = UIColor.white
-            status_txt.accessibilityLabel = "Connecting to \(self.jacket.name)"
+            status_txt.accessibilityLabel = "Connecting to \(self.jacket.dashboardTitleText())"
             
             loader_image.startAnimatingGif()
             self.jacket_image.image = UIImage(named: "jacket")
@@ -102,7 +102,7 @@ class DisconnectedViewController: BaseViewController {
         
         searching = false;
         status_txt.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1);
-        status_txt.text = String(format: "%@ is Not Connected", self.jacket.name)
+        status_txt.text = String(format: "%@ is Not Connected", self.jacket.dashboardTitleText())
         
         self.loader_image.stopAnimatingGif()
         self.loader_image.currentImage = UIImage(named: "loaded_bar")
@@ -132,7 +132,7 @@ class DisconnectedViewController: BaseViewController {
         let alert :Alert = Alert(context: self)
         alert.yesMessage = "Reconnect"
         alert.noMessage = "Cancel"
-        alert.create(message: String(format:"The \"%@\" Jacket appears to be out of range or has lost connection, please move your device closer to reconnect.",jacket.name), type: Alert.ASK)
+        alert.create(message: String(format:"The \"%@\" appears to be out of range or has lost connection, please move your device closer to reconnect.", jacket.dashboardTitleText()), type: Alert.ASK)
         alert.setActionListener(listener: Alert.ActionListener(onActionClick: { (action) in
             if(action==Alert.YES_ACTION){
                 self.startSearch();

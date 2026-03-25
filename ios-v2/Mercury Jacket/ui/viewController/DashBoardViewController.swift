@@ -41,15 +41,22 @@ class DashBoardViewController: BaseViewController, CLLocationManagerDelegate {
             stats_button?.setImage(UIImage(systemName: "chart.bar.xaxis"), for: .normal)
             stats_button?.tintColor = .white
         }
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
         self.jacket = AppController.getCurrentJacket()
-        self.name_txt.text = jacket.name
+        self.name_txt.text = jacket.dashboardTitleText()
 
         bluetoothController.listenTo(id: TAG, eventName: BluetoothController.Events.ON_SERVICES_DICOVERED) { (param) in
             guard let deviceID = param as? String, deviceID == self.jacket.id else { return }
+            self.jacket = AppController.getCurrentJacket() ?? self.jacket
+            self.name_txt.text = self.jacket.dashboardTitleText()
             self.bluetoothController.writeCharacteristic(uuid: JacketGattAttributes.MOTION_TEMP, value: self.jacket.getSetting(key: Jacket.MOTION_CONTROL) ? 1 : 0)
+            // Firmware on some vests does not report MODE until reads settle; still show the connected UI when the link is up.
+            if self.bluetoothController.isConnected() {
+                self.setFragment(fragment: self.connectedViewController)
+            }
         }
 
         bluetoothController.listenTo(id: TAG, eventName: BluetoothController.Events.ON_DEVICE_DISCONNECTED) { (param) in
@@ -72,6 +79,9 @@ class DashBoardViewController: BaseViewController, CLLocationManagerDelegate {
                 print("DASHBOARD: MODE=", intValue)
                 if intValue == 0 {
                     self.bluetoothController.readCharacteristic(uuid: JacketGattAttributes.MODE)
+                    if self.bluetoothController.isConnected() {
+                        self.setFragment(fragment: self.connectedViewController)
+                    }
                 } else {
                     self.setFragment(fragment: self.connectedViewController)
                 }
@@ -85,7 +95,9 @@ class DashBoardViewController: BaseViewController, CLLocationManagerDelegate {
             }
         }
 
-        if self.subNavigationController.topViewController == nil || (self.subNavigationController.topViewController != nil && !bluetoothController.isConnected()) {
+        if bluetoothController.isConnected() {
+            setFragment(fragment: connectedViewController)
+        } else {
             setFragment(fragment: disconnectedViewController)
         }
         if jacket.getSetting(key: Jacket.LOCATION_REQUEST) {
@@ -207,7 +219,7 @@ class DashBoardViewController: BaseViewController, CLLocationManagerDelegate {
             self.icon.image = UIImage(named: self.localTemperature ? "ic_jacket" : "ic_location")
 
             self.temperature_txt.accessibilityLabel = "\(displayText) degrees \(unit == "F" ? "Fahrenheit" : "Celsius")"
-            self.name_txt.accessibilityLabel = "Connected jacket: \(self.name_txt.text ?? "")"
+            self.name_txt.accessibilityLabel = "Connected device: \(self.name_txt.text ?? "")"
             self.icon.accessibilityLabel = self.localTemperature ? "Temperature from jacket sensor" : "Temperature from location"
             self.stats_button?.accessibilityLabel = "View session statistics"
         }

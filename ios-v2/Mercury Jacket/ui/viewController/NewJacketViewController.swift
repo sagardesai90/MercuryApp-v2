@@ -143,8 +143,9 @@ class NewJacketViewController: UIViewController, UITextFieldDelegate {
         let id   :String = self.device!.identifier.uuidString
         //let id   :String = String(describing: Int.random(in: 0..<6));
         let name :String = name_txt.text!
-        
-        let instance =  Jacket(id: id, name: name)
+        let advertised = self.device?.name
+
+        let instance = Jacket(id: id, name: name, advertisedDeviceName: advertised)
         instance.save();
         AppController.connectedTo(jacket: instance);
         
