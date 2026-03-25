@@ -86,7 +86,7 @@ class Alert
     {
         if(self.alertController != nil) {
             print("SHOW ALERT");
-            self.context.present(self.alertController!, animated: false, completion: nil)
+            self.context.present(self.alertController!, animated: true, completion: nil)
         }
     }
     

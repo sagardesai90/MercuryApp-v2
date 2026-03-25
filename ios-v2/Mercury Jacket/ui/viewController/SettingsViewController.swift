@@ -91,7 +91,8 @@ class SettingsViewController: BaseViewController, UITableViewDelegate, UITableVi
         }
         
         let settingCell :SettingViewCell = cell as! SettingViewCell
-        self.cellHeight = Float(settingCell.tableHeight.constant + 200)
+        // Inner table + action buttons (connect / disconnect / delete / rename)
+        self.cellHeight = Float(settingCell.tableHeight.constant + 280)
         
         switch selectedIndexPath {
         case nil:

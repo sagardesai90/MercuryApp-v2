@@ -24,6 +24,9 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
     var jacket :Jacket? = nil
     private var settings :[[Any]] = []
     
+    private var headerGlass: UIVisualEffectView?
+    private var renameButton: UIButton?
+
     override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -31,6 +34,84 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
         
         table_view.delegate = self
         table_view.dataSource = self
+
+        setupHeaderGlass()
+        ensureRenameButton()
+    }
+
+    private func setupHeaderGlass() {
+        guard let headerView = header else { return }
+        let glass = UIView.makeGlassBackground(cornerRadius: 10)
+        headerView.insertSubview(glass, at: 0)
+        headerView.backgroundColor = .clear
+        NSLayoutConstraint.activate([
+            glass.topAnchor.constraint(equalTo: headerView.topAnchor),
+            glass.leadingAnchor.constraint(equalTo: headerView.leadingAnchor),
+            glass.trailingAnchor.constraint(equalTo: headerView.trailingAnchor),
+            glass.bottomAnchor.constraint(equalTo: headerView.bottomAnchor)
+        ])
+        headerGlass = glass
+    }
+
+    private func ensureRenameButton() {
+        guard renameButton == nil, let stack = stack else { return }
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitle("Rename device", for: .normal)
+        btn.titleLabel?.font = UIFont(name: "FoundersGrotesk-Regular", size: 17) ?? .systemFont(ofSize: 17, weight: .regular)
+        btn.setTitleColor(.white, for: .normal)
+        btn.contentHorizontalAlignment = .left
+        btn.accessibilityLabel = "Rename device"
+        btn.accessibilityHint = "Change the display name for this product"
+        btn.addTarget(self, action: #selector(renameTapped), for: .touchUpInside)
+        btn.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        stack.insertArrangedSubview(btn, at: 0)
+        renameButton = btn
+    }
+
+    @objc private func renameTapped() {
+        presentRenameAlert()
+    }
+
+    private func presentRenameAlert() {
+        guard let j = jacket else { return }
+        let vc = AppController.getContext()
+        let alert = UIAlertController(
+            title: "Rename device",
+            message: "This name is only used in the app.",
+            preferredStyle: .alert
+        )
+        alert.addTextField { tf in
+            tf.text = j.name
+            tf.clearButtonMode = .whileEditing
+            tf.autocapitalizationType = .words
+            tf.returnKeyType = .done
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Save", style: .default) { [weak self] _ in
+            self?.applyRenamedName(from: alert)
+        })
+        vc.present(alert, animated: true)
+    }
+
+    private func applyRenamedName(from alert: UIAlertController) {
+        guard let j = jacket else { return }
+        let raw = alert.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if raw.isEmpty {
+            _ = Alert.show(context: AppController.getContext(), message: "Enter a name for the device.")
+            return
+        }
+        if raw.count > 20 {
+            _ = Alert.show(context: AppController.getContext(), message: "Max characters 20.")
+            return
+        }
+        j.name = raw
+        j.save()
+        if AppController.getCurrentJacket()?.id == j.id {
+            AppController.connectedTo(jacket: j)
+        }
+        setJacket(jacket: j)
+        SettingsViewController.instance.updateData()
     }
     
     @IBAction func connect_handle(_ sender: Any) {
@@ -40,8 +121,8 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
         alert.create(message: "Would you like to switch to the \"\(self.jacket!.name)\" jacket?", type: Alert.ASK)
         alert.setActionListener(listener: Alert.ActionListener(onActionClick: { (action) in
             if action == Alert.YES_ACTION {
-                // Just switch the selected jacket — all devices stay connected in the background
                 AppController.connectedTo(jacket: self.jacket)
+                BluetoothController.getInstance().connectAllRegistered()
                 AppController.startViewController(viewController: AppController.instantiate(id: String(describing: DashBoardViewController.self)))
             }
         }))
@@ -123,7 +204,7 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
 
     func setJacket(jacket: Jacket)
     {
-        self.name_txt.text = jacket.name
+        self.name_txt.text = jacket.dashboardTitleText()
         self.connect_bt.title_txt.text = String(format: "Connect %@", jacket.name)
         self.disconenct_bt.title_txt.text = String(format: "Disconnect %@", jacket.name)
         self.delete_bt.title_txt.text = String(format: "Delete %@", jacket.name)
@@ -131,10 +212,14 @@ class SettingViewCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
         self.connect_bt.isHidden = AppController.getCurrentJacket() != nil ? jacket.id==AppController.getCurrentJacket()?.id : false
         self.disconenct_bt.isHidden = true//AppController.getCurrentJacket() != nil ? jacket.id != AppController.getCurrentJacket()?.id : true
         
-        if(AppController.getCurrentJacket() != nil && jacket.id==AppController.getCurrentJacket()?.id){
-            self.header.backgroundColor = UIColor(hexString: "#4D565E")
-        }else {
-            self.header.backgroundColor = UIColor.clear
+        let isCurrentJacket = AppController.getCurrentJacket() != nil
+            && jacket.id == AppController.getCurrentJacket()?.id
+        if isCurrentJacket {
+            headerGlass?.layer.borderWidth = 1
+            headerGlass?.layer.borderColor = UIColor(hexString: "#FA7272").withAlphaComponent(0.4).cgColor
+        } else {
+            headerGlass?.layer.borderWidth = 0
+            headerGlass?.layer.borderColor = UIColor.clear.cgColor
         }
         
         //if(self.jacket == nil)

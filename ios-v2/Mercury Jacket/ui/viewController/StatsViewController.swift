@@ -30,8 +30,8 @@ class StatsViewController: UIViewController {
         let sc = UISegmentedControl(items: ["TEMPERATURE", "HEATING"])
         sc.translatesAutoresizingMaskIntoConstraints = false
         sc.selectedSegmentIndex = 0
-        sc.backgroundColor = StatsTheme.card
-        sc.selectedSegmentTintColor = StatsTheme.accentRed
+        sc.backgroundColor = StatsTheme.card.withAlphaComponent(0.3)
+        sc.selectedSegmentTintColor = StatsTheme.accentRed.withAlphaComponent(0.85)
         sc.setTitleTextAttributes(
             [.foregroundColor: StatsTheme.secondaryText,
              .font: UIFont.systemFont(ofSize: 11, weight: .semibold)],
@@ -44,13 +44,15 @@ class StatsViewController: UIViewController {
         return sc
     }()
 
+    private lazy var chartContainer: UIView = {
+        return StatsTheme.makeGlassCard(cornerRadius: 12)
+    }()
+
     private lazy var chartView: LineChartView = {
         let cv = LineChartView()
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = StatsTheme.card
-        cv.layer.cornerRadius = 12
-        cv.layer.borderWidth = 1
-        cv.layer.borderColor = StatsTheme.border.cgColor
+        cv.backgroundColor = .clear
+        cv.isOpaque = false
         cv.clipsToBounds = true
         return cv
     }()
@@ -117,12 +119,24 @@ class StatsViewController: UIViewController {
     private func setupNavBar() {
         navigationController?.navigationBar.barStyle = .black
         navigationController?.navigationBar.tintColor = .white
-        navigationController?.navigationBar.barTintColor = StatsTheme.background
-        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.isTranslucent = true
         navigationController?.navigationBar.titleTextAttributes = [
             .foregroundColor: UIColor.white,
             .font: UIFont.systemFont(ofSize: 13, weight: .semibold)
         ]
+
+        if #available(iOS 13.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+            appearance.backgroundColor = StatsTheme.background.withAlphaComponent(0.7)
+            appearance.titleTextAttributes = [
+                .foregroundColor: UIColor.white,
+                .font: UIFont.systemFont(ofSize: 13, weight: .semibold)
+            ]
+            appearance.backgroundEffect = UIBlurEffect(style: .systemThinMaterialDark)
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        }
     }
 
     // MARK: - Layout
@@ -137,8 +151,9 @@ class StatsViewController: UIViewController {
         contentView.addSubview(sessionHeader)
         contentView.addSubview(sessionCard)
         contentView.addSubview(segmentControl)
-        contentView.addSubview(chartView)
-        chartView.addSubview(lastUpdateLabel)
+        contentView.addSubview(chartContainer)
+        chartContainer.addSubview(chartView)
+        chartContainer.addSubview(lastUpdateLabel)
         contentView.addSubview(legendStack)
         contentView.addSubview(historyHeader)
         contentView.addSubview(historyStack)
@@ -168,12 +183,17 @@ class StatsViewController: UIViewController {
             segmentControl.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             segmentControl.heightAnchor.constraint(equalToConstant: 36),
 
-            chartView.topAnchor.constraint(equalTo: segmentControl.bottomAnchor, constant: 10),
-            chartView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            chartView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            chartView.heightAnchor.constraint(equalToConstant: 250),
+            chartContainer.topAnchor.constraint(equalTo: segmentControl.bottomAnchor, constant: 10),
+            chartContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            chartContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            chartContainer.heightAnchor.constraint(equalToConstant: 250),
 
-            legendStack.topAnchor.constraint(equalTo: chartView.bottomAnchor, constant: 10),
+            chartView.topAnchor.constraint(equalTo: chartContainer.topAnchor),
+            chartView.leadingAnchor.constraint(equalTo: chartContainer.leadingAnchor),
+            chartView.trailingAnchor.constraint(equalTo: chartContainer.trailingAnchor),
+            chartView.bottomAnchor.constraint(equalTo: chartContainer.bottomAnchor),
+
+            legendStack.topAnchor.constraint(equalTo: chartContainer.bottomAnchor, constant: 10),
             legendStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
 
             historyHeader.topAnchor.constraint(equalTo: legendStack.bottomAnchor, constant: 28),
@@ -184,8 +204,8 @@ class StatsViewController: UIViewController {
             historyStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             historyStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30),
 
-            lastUpdateLabel.topAnchor.constraint(equalTo: chartView.topAnchor, constant: 7),
-            lastUpdateLabel.trailingAnchor.constraint(equalTo: chartView.trailingAnchor, constant: -10)
+            lastUpdateLabel.topAnchor.constraint(equalTo: chartContainer.topAnchor, constant: 7),
+            lastUpdateLabel.trailingAnchor.constraint(equalTo: chartContainer.trailingAnchor, constant: -10)
         ])
     }
 
@@ -229,7 +249,7 @@ class StatsViewController: UIViewController {
         pulse.toValue   = StatsTheme.border.cgColor
         pulse.duration  = 1.2
         pulse.timingFunction = CAMediaTimingFunction(name: .easeOut)
-        chartView.layer.add(pulse, forKey: "liveFlash")
+        chartContainer.layer.add(pulse, forKey: "liveFlash")
     }
 
     // MARK: - Data
@@ -254,17 +274,22 @@ class StatsViewController: UIViewController {
 
     // MARK: - Render helpers
 
+    private var sessionCardContent: UIView? {
+        sessionCard.viewWithTag(StatsTheme.glassContentTag)
+    }
+
     private func renderSessionCard() {
-        sessionCard.subviews.forEach { $0.removeFromSuperview() }
+        let host = sessionCardContent ?? sessionCard
+        host.subviews.forEach { $0.removeFromSuperview() }
 
         guard let session = displaySession else {
             let lbl = makeLabel("No sessions recorded yet",
                                 size: 13, weight: .regular, color: StatsTheme.secondaryText)
             lbl.textAlignment = .center
-            sessionCard.addSubview(lbl)
+            host.addSubview(lbl)
             NSLayoutConstraint.activate([
-                lbl.centerXAnchor.constraint(equalTo: sessionCard.centerXAnchor),
-                lbl.centerYAnchor.constraint(equalTo: sessionCard.centerYAnchor)
+                lbl.centerXAnchor.constraint(equalTo: host.centerXAnchor),
+                lbl.centerYAnchor.constraint(equalTo: host.centerYAnchor)
             ])
             return
         }
@@ -279,13 +304,13 @@ class StatsViewController: UIViewController {
         statsRow.translatesAutoresizingMaskIntoConstraints = false
         statsRow.axis = .horizontal
         statsRow.distribution = .fillEqually
-        sessionCard.addSubview(statsRow)
+        host.addSubview(statsRow)
 
         NSLayoutConstraint.activate([
-            statsRow.leadingAnchor.constraint(equalTo: sessionCard.leadingAnchor, constant: 16),
-            statsRow.trailingAnchor.constraint(equalTo: sessionCard.trailingAnchor, constant: -16),
-            statsRow.topAnchor.constraint(equalTo: sessionCard.topAnchor, constant: 14),
-            statsRow.bottomAnchor.constraint(equalTo: sessionCard.bottomAnchor, constant: -14)
+            statsRow.leadingAnchor.constraint(equalTo: host.leadingAnchor, constant: 16),
+            statsRow.trailingAnchor.constraint(equalTo: host.trailingAnchor, constant: -16),
+            statsRow.topAnchor.constraint(equalTo: host.topAnchor, constant: 14),
+            statsRow.bottomAnchor.constraint(equalTo: host.bottomAnchor, constant: -14)
         ])
 
         let items: [(String, String, UIColor)] = [
@@ -300,14 +325,14 @@ class StatsViewController: UIViewController {
             dot.translatesAutoresizingMaskIntoConstraints = false
             dot.backgroundColor = StatsTheme.liveGreen
             dot.layer.cornerRadius = 4
-            sessionCard.addSubview(dot)
+            host.addSubview(dot)
 
             let liveLbl = makeLabel("LIVE", size: 9, weight: .bold, color: StatsTheme.liveGreen)
-            sessionCard.addSubview(liveLbl)
+            host.addSubview(liveLbl)
 
             NSLayoutConstraint.activate([
-                dot.trailingAnchor.constraint(equalTo: sessionCard.trailingAnchor, constant: -14),
-                dot.topAnchor.constraint(equalTo: sessionCard.topAnchor, constant: 10),
+                dot.trailingAnchor.constraint(equalTo: host.trailingAnchor, constant: -14),
+                dot.topAnchor.constraint(equalTo: host.topAnchor, constant: 10),
                 dot.widthAnchor.constraint(equalToConstant: 7),
                 dot.heightAnchor.constraint(equalToConstant: 7),
                 liveLbl.trailingAnchor.constraint(equalTo: dot.leadingAnchor, constant: -4),
@@ -467,13 +492,7 @@ class StatsViewController: UIViewController {
     // MARK: - View factories
 
     private func makeCard() -> UIView {
-        let v = UIView()
-        v.translatesAutoresizingMaskIntoConstraints = false
-        v.backgroundColor = StatsTheme.card
-        v.layer.cornerRadius = 12
-        v.layer.borderWidth = 1
-        v.layer.borderColor = StatsTheme.border.cgColor
-        return v
+        return StatsTheme.makeGlassCard(cornerRadius: 12)
     }
 
     private func makeSectionLabel(_ text: String) -> UILabel {
@@ -530,6 +549,7 @@ class StatsViewController: UIViewController {
     private func makeSessionRow(_ session: Session, index: Int) -> UIView {
         let card = makeCard()
         card.heightAnchor.constraint(equalToConstant: 72).isActive = true
+        let host = card.viewWithTag(StatsTheme.glassContentTag) ?? card
 
         let dateFmt = DateFormatter()
         dateFmt.dateStyle = .medium
@@ -555,27 +575,27 @@ class StatsViewController: UIViewController {
         chevron.tintColor = StatsTheme.secondaryText
         chevron.contentMode = .scaleAspectFit
 
-        for v in [dateLbl, durationLbl, powerLbl, powerTitle, energyLbl, chevron] { card.addSubview(v) }
+        for v in [dateLbl, durationLbl, powerLbl, powerTitle, energyLbl, chevron] { host.addSubview(v) }
 
         NSLayoutConstraint.activate([
-            dateLbl.topAnchor.constraint(equalTo: card.topAnchor, constant: 12),
-            dateLbl.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
+            dateLbl.topAnchor.constraint(equalTo: host.topAnchor, constant: 12),
+            dateLbl.leadingAnchor.constraint(equalTo: host.leadingAnchor, constant: 16),
             dateLbl.trailingAnchor.constraint(lessThanOrEqualTo: chevron.leadingAnchor, constant: -8),
 
             durationLbl.topAnchor.constraint(equalTo: dateLbl.bottomAnchor, constant: 4),
-            durationLbl.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
+            durationLbl.leadingAnchor.constraint(equalTo: host.leadingAnchor, constant: 16),
 
-            powerLbl.topAnchor.constraint(equalTo: card.topAnchor, constant: 12),
+            powerLbl.topAnchor.constraint(equalTo: host.topAnchor, constant: 12),
             powerLbl.trailingAnchor.constraint(equalTo: chevron.leadingAnchor, constant: -12),
 
             powerTitle.topAnchor.constraint(equalTo: powerLbl.bottomAnchor, constant: 2),
             powerTitle.trailingAnchor.constraint(equalTo: chevron.leadingAnchor, constant: -12),
 
-            energyLbl.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -10),
+            energyLbl.bottomAnchor.constraint(equalTo: host.bottomAnchor, constant: -10),
             energyLbl.trailingAnchor.constraint(equalTo: chevron.leadingAnchor, constant: -12),
 
-            chevron.centerYAnchor.constraint(equalTo: card.centerYAnchor),
-            chevron.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -14),
+            chevron.centerYAnchor.constraint(equalTo: host.centerYAnchor),
+            chevron.trailingAnchor.constraint(equalTo: host.trailingAnchor, constant: -14),
             chevron.widthAnchor.constraint(equalToConstant: 10),
             chevron.heightAnchor.constraint(equalToConstant: 16)
         ])
@@ -584,12 +604,12 @@ class StatsViewController: UIViewController {
         tapBtn.translatesAutoresizingMaskIntoConstraints = false
         tapBtn.tag = index
         tapBtn.addTarget(self, action: #selector(sessionRowTapped(_:)), for: .touchUpInside)
-        card.addSubview(tapBtn)
+        host.addSubview(tapBtn)
         NSLayoutConstraint.activate([
-            tapBtn.leadingAnchor.constraint(equalTo: card.leadingAnchor),
-            tapBtn.trailingAnchor.constraint(equalTo: card.trailingAnchor),
-            tapBtn.topAnchor.constraint(equalTo: card.topAnchor),
-            tapBtn.bottomAnchor.constraint(equalTo: card.bottomAnchor)
+            tapBtn.leadingAnchor.constraint(equalTo: host.leadingAnchor),
+            tapBtn.trailingAnchor.constraint(equalTo: host.trailingAnchor),
+            tapBtn.topAnchor.constraint(equalTo: host.topAnchor),
+            tapBtn.bottomAnchor.constraint(equalTo: host.bottomAnchor)
         ])
 
         return card

@@ -40,6 +40,14 @@ class RunningViewController: BaseViewController {
     private var debug :Bool = false
     private var debugCount :Int = 0
     
+    private var sliderGlassView: UIVisualEffectView?
+    private var sliderGlassLeadingConstraint: NSLayoutConstraint?
+    private var sliderGlassTrailingConstraint: NSLayoutConstraint?
+    private var sliderGlassTopConstraint: NSLayoutConstraint?
+    private var sliderGlassBottomConstraint: NSLayoutConstraint?
+    /// Background art with level tick marks — must sit *below* the glass so UIGlassEffect can sample it.
+    private weak var sliderBackgroundImageView: UIImageView?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -69,6 +77,130 @@ class RunningViewController: BaseViewController {
         
         self.preloader_image.isUserInteractionEnabled = true
         self.preloader_image.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(preloaderTapped(tapGestureRecognizer:))))
+
+        setupSliderGlass()
+        relocateSliderBackgroundUnderGlass()
+    }
+
+    /// Puts `bg_temperature_controller` under the glass inside the track container. When it was a sibling
+    /// behind the whole container, the glass only blurred empty/black space — lines never showed through.
+    private func relocateSliderBackgroundUnderGlass() {
+        guard let slider = slider_bar, let container = container_mask_bar else { return }
+        guard let bg = slider.subviews.first(where: { $0 is UIImageView }) as? UIImageView else { return }
+        sliderBackgroundImageView = bg
+        bg.removeFromSuperview()
+        bg.translatesAutoresizingMaskIntoConstraints = false
+        container.insertSubview(bg, at: 0)
+        NSLayoutConstraint.activate([
+            bg.topAnchor.constraint(equalTo: container.topAnchor),
+            bg.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            bg.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            bg.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+        // Stack (back → front): bg art → masked red fill → glass, so the heat color reads through the liquid glass.
+        if let g = sliderGlassView {
+            container.bringSubviewToFront(g)
+        }
+        clearSliderChromeBorders()
+    }
+
+    private func clearSliderChromeBorders() {
+        slider_bar.layer.borderWidth = 0
+        container_mask_bar?.layer.borderWidth = 0
+        mask_view?.layer.borderWidth = 0
+        bar_image?.layer.borderWidth = 0
+        sliderGlassView?.layer.borderWidth = 0
+        sliderGlassView?.layer.borderColor = nil
+        sliderBackgroundImageView?.layer.borderWidth = 0
+    }
+
+    private func setupSliderGlass() {
+        guard let bar = container_mask_bar else { return }
+        slider_bar.clipsToBounds = false
+        // Glass is inset -1% on each edge (slightly larger than the track); must not clip the overflow.
+        bar.clipsToBounds = false
+        bar.layer.masksToBounds = false
+        bar.layer.borderWidth = 0
+        // Build the effect view here so iOS 26 always gets UIGlassEffect (liquid glass), not only via the shared helper path.
+        // `.clear` / ultra-thin blur keeps the track readable without the heavy dark veil of `.regular` / `systemMaterialDark`.
+        let glass: UIVisualEffectView
+        if #available(iOS 26.0, *) {
+            glass = UIVisualEffectView(effect: UIGlassEffect(style: .clear))
+        } else {
+            glass = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
+        }
+        glass.translatesAutoresizingMaskIntoConstraints = false
+        glass.isOpaque = false
+        glass.backgroundColor = .clear
+        // Rounded overscan matches `container_mask_bar` squircle in `syncSliderGlassCornerRadius`.
+        glass.clipsToBounds = true
+        glass.layer.borderWidth = 0
+        // Glass sits above the red fill; must not steal drags from the track.
+        glass.isUserInteractionEnabled = false
+        bar.insertSubview(glass, at: 0)
+        let top = glass.topAnchor.constraint(equalTo: bar.topAnchor, constant: 0)
+        let lead = glass.leadingAnchor.constraint(equalTo: bar.leadingAnchor, constant: 0)
+        let trail = glass.trailingAnchor.constraint(equalTo: bar.trailingAnchor, constant: 0)
+        let bot = glass.bottomAnchor.constraint(equalTo: bar.bottomAnchor, constant: 0)
+        NSLayoutConstraint.activate([top, lead, trail, bot])
+        sliderGlassLeadingConstraint = lead
+        sliderGlassTrailingConstraint = trail
+        sliderGlassTopConstraint = top
+        sliderGlassBottomConstraint = bot
+        sliderGlassView = glass
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        syncSliderGlassCornerRadius()
+    }
+
+    /// Squircle on the track container only. Applying the same radius to bg + glass + bar caused sub-pixel drift at corners (black “peek”).
+    /// Red fill = `bar_image` (power level), not glass. Liquid glass is between bg art and the mask; red sits above the glass in the fill region.
+    private func syncSliderGlassCornerRadius() {
+        guard let bar = container_mask_bar, let glass = sliderGlassView else { return }
+        let w = bar.bounds.width
+        let h = bar.bounds.height
+        guard w > 0, h > 0 else { return }
+        let shorter = min(w, h)
+        let r = min(36, max(16, shorter * 0.22))
+        // Glass is ~1% larger on each side than the track; match radius to the expanded squircle.
+        let overscan: CGFloat = 0.01
+        let rGlass = r * (1 + 2 * overscan)
+        let dx = w * overscan
+        let dy = h * overscan
+        sliderGlassLeadingConstraint?.constant = -dx
+        sliderGlassTrailingConstraint?.constant = dx
+        sliderGlassTopConstraint?.constant = -dy
+        sliderGlassBottomConstraint?.constant = dy
+        if #available(iOS 13.0, *) {
+            bar.layer.cornerCurve = .continuous
+        }
+        bar.layer.cornerRadius = r
+        bar.layer.masksToBounds = false
+        bar.clipsToBounds = false
+
+        glass.layer.cornerRadius = rGlass
+        glass.layer.masksToBounds = true
+        if #available(iOS 13.0, *) {
+            glass.layer.cornerCurve = .continuous
+        }
+
+        sliderBackgroundImageView?.layer.cornerRadius = 0
+        sliderBackgroundImageView?.clipsToBounds = false
+
+        mask_view?.layer.cornerRadius = 0
+        mask_view?.clipsToBounds = true
+
+        bar_image?.layer.cornerRadius = 0
+        bar_image?.clipsToBounds = false
+
+        // Keep glass above the masked fill so red shows through the material.
+        if let g = sliderGlassView {
+            bar.bringSubviewToFront(g)
+        }
+
+        clearSliderChromeBorders()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -441,7 +573,7 @@ class RunningViewController: BaseViewController {
         manual_bt.setImage(UIImage(named: "manual_bt_active"), for: UIControl.State.normal)
         smart_bt.isUserInteractionEnabled = true
         manual_bt.isUserInteractionEnabled = false
-        
+
         updateLevel(level: self.level, animate: true);
         
         self.bluetoothController.readCharacteristic(uuid: JacketGattAttributes.POWER_LEVEL)
@@ -468,7 +600,7 @@ class RunningViewController: BaseViewController {
         smart_bt.setImage(UIImage(named: "smart_bt_active"), for: UIControl.State.normal)
         smart_bt.isUserInteractionEnabled = false
         manual_bt.isUserInteractionEnabled = true
-        
+
         updateLevel(level: self.level, animate: true);
         
         self.bluetoothController.readCharacteristic(uuid: JacketGattAttributes.POWER_LEVEL)

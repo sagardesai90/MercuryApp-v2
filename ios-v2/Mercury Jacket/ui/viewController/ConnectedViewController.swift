@@ -26,6 +26,8 @@ class ConnectedViewController: BaseViewController {
     private var jacket : Jacket!
     private var bluetoothController :BluetoothController!
     private var batteryLabel: UILabel?
+    private var batteryIconView: UIImageView?
+    private var batteryPill: UIVisualEffectView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,37 +38,80 @@ class ConnectedViewController: BaseViewController {
         self.standByViewController = self.subNavigationController.topViewController as? StandByViewController
         self.runningViewController = AppController.instantiate(id: String(describing: RunningViewController.self)) as? RunningViewController
 
-        setupBatteryLabel()
+        setupBatteryIndicator()
     }
 
-    private func setupBatteryLabel() {
+    private func setupBatteryIndicator() {
+        let pill = UIView.makeGlassPill(height: 28)
+        pill.isHidden = true
+        view.addSubview(pill)
+
+        let iconView = UIImageView()
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        iconView.contentMode = .scaleAspectFit
+        iconView.tintColor = .white
+        pill.contentView.addSubview(iconView)
+
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.font = UIFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium)
+        lbl.font = UIFont.monospacedDigitSystemFont(ofSize: 11, weight: .semibold)
         lbl.textColor = .white
         lbl.textAlignment = .right
-        lbl.isHidden = true
-        view.addSubview(lbl)
+        pill.contentView.addSubview(lbl)
+
         NSLayoutConstraint.activate([
-            lbl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            lbl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            pill.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            pill.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+
+            iconView.leadingAnchor.constraint(equalTo: pill.contentView.leadingAnchor, constant: 8),
+            iconView.centerYAnchor.constraint(equalTo: pill.contentView.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 16),
+            iconView.heightAnchor.constraint(equalToConstant: 16),
+
+            lbl.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 4),
+            lbl.trailingAnchor.constraint(equalTo: pill.contentView.trailingAnchor, constant: -10),
+            lbl.centerYAnchor.constraint(equalTo: pill.contentView.centerYAnchor)
         ])
+
+        batteryPill = pill
+        batteryIconView = iconView
         batteryLabel = lbl
     }
 
     private func updateBatteryDisplay() {
         let batteryVal = bluetoothController.getValue(uuid: JacketGattAttributes.BATTERY_LEVEL)
-        if batteryVal > 0 {
-            let icon: String
-            if batteryVal > 75 { icon = "🔋" }
-            else if batteryVal > 25 { icon = "🪫" }
-            else { icon = "🪫" }
-            batteryLabel?.text = "\(icon) \(batteryVal)%"
-            batteryLabel?.isHidden = false
-            batteryLabel?.accessibilityLabel = "Battery level: \(batteryVal) percent"
-        } else {
-            batteryLabel?.isHidden = true
+        guard batteryVal > 0 else {
+            batteryPill?.isHidden = true
+            return
         }
+
+        let symbolName: String
+        let tintColor: UIColor
+        if batteryVal > 75 {
+            symbolName = "battery.100"
+            tintColor = UIColor(red: 0.20, green: 0.85, blue: 0.20, alpha: 1)
+        } else if batteryVal > 50 {
+            symbolName = "battery.75"
+            tintColor = .white
+        } else if batteryVal > 25 {
+            symbolName = "battery.50"
+            tintColor = UIColor(red: 1.0, green: 0.8, blue: 0.0, alpha: 1)
+        } else {
+            symbolName = "battery.25"
+            tintColor = UIColor(red: 0.95, green: 0.3, blue: 0.3, alpha: 1)
+        }
+
+        if #available(iOS 13.0, *) {
+            batteryIconView?.image = UIImage(systemName: symbolName)
+        }
+        batteryIconView?.tintColor = tintColor
+        batteryLabel?.text = "\(batteryVal)%"
+        batteryLabel?.textColor = tintColor
+        batteryPill?.isHidden = false
+        batteryPill?.accessibilityLabel = "Battery level: \(batteryVal) percent"
+
+        batteryPill?.layer.borderWidth = batteryVal <= 25 ? 1 : 0
+        batteryPill?.layer.borderColor = tintColor.withAlphaComponent(0.4).cgColor
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -145,7 +190,10 @@ class ConnectedViewController: BaseViewController {
                 self.setFragment(fragment: runningViewController)
         break;
         default:
-            //self.setFragment(fragment: standByViewController)
+            // MODE 0 or unknown — some firmware builds omit valid MODE until later reads; treat as standby.
+            if mode == 0 {
+                self.setFragment(fragment: standByViewController)
+            }
             break
         }
     }

@@ -8,6 +8,55 @@
 
 import UIKit
 
+// MARK: - Liquid Glass Helpers
+
+extension UIView {
+
+    /// Creates a `UIVisualEffectView` using `UIGlassEffect` on iOS 26+.
+    /// On earlier OS versions, `UIGlassEffect` is unavailable — use `fallbackStyle` (e.g. `.systemMaterialDark` on dark UIs; `.systemThinMaterialDark` is very subtle on black).
+    static func makeGlassBackground(
+        cornerRadius: CGFloat = 16,
+        fallbackStyle: UIBlurEffect.Style = .systemThinMaterialDark
+    ) -> UIVisualEffectView {
+        let effectView: UIVisualEffectView
+        if #available(iOS 26.0, *) {
+            let glass = UIGlassEffect()
+            effectView = UIVisualEffectView(effect: glass)
+        } else {
+            effectView = UIVisualEffectView(effect: UIBlurEffect(style: fallbackStyle))
+        }
+        effectView.translatesAutoresizingMaskIntoConstraints = false
+        effectView.layer.cornerRadius = cornerRadius
+        effectView.clipsToBounds = true
+        return effectView
+    }
+
+    /// Inserts a full-bleed glass background at the bottom of the subview stack.
+    @discardableResult
+    func insertGlassBackground(
+        cornerRadius: CGFloat = 16,
+        fallbackStyle: UIBlurEffect.Style = .systemThinMaterialDark
+    ) -> UIVisualEffectView {
+        let glass = UIView.makeGlassBackground(
+            cornerRadius: cornerRadius, fallbackStyle: fallbackStyle)
+        insertSubview(glass, at: 0)
+        NSLayoutConstraint.activate([
+            glass.topAnchor.constraint(equalTo: topAnchor),
+            glass.leadingAnchor.constraint(equalTo: leadingAnchor),
+            glass.trailingAnchor.constraint(equalTo: trailingAnchor),
+            glass.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        return glass
+    }
+
+    /// Creates a standalone glass "pill" container suitable for small indicators.
+    static func makeGlassPill(height: CGFloat = 28) -> UIVisualEffectView {
+        let pill = makeGlassBackground(cornerRadius: height / 2)
+        pill.heightAnchor.constraint(equalToConstant: height).isActive = true
+        return pill
+    }
+}
+
 @IBDesignable extension UIView {
     func hideKeyboardWhenTappedAround() {
         let tapGesture = UITapGestureRecognizer(target: self,
